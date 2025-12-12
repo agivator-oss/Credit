@@ -1,0 +1,117 @@
+{
+  "sheet": "Credit Checklist",
+  "version": "1.0",
+  "columns": ["Item/Description", "Status", "CHECK", "COMMENTS"],
+  "rows": [
+    {
+      "id": "deal_presentation_provided",
+      "section": "Application",
+      "label": "Deal presentation provided",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "dealPresentationProvided" }
+    },
+    {
+      "id": "executed_application_form",
+      "section": "Application",
+      "label": "Executed Application form",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "executedApplicationForm" }
+    },
+    {
+      "id": "credit_consent_signed",
+      "section": "Application",
+      "label": "Credit check consent signed",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "creditConsentSigned" }
+    },
+
+    {
+      "id": "drivers_license_held",
+      "section": "KYC / Identification",
+      "label": "Driver's licence held",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "driversLicenseHeld" }
+    },
+    {
+      "id": "passport_held",
+      "section": "KYC / Identification",
+      "label": "Passport held",
+      "defaultStatus": "",
+      "rules": { "dealField": "passportHeld" }
+    },
+    {
+      "id": "medicare_held",
+      "section": "KYC / Identification",
+      "label": "Medicare card held",
+      "defaultStatus": "",
+      "rules": { "dealField": "medicareHeld" }
+    },
+
+    {
+      "id": "abn_checked",
+      "section": "Business Checks",
+      "label": "ABN checked",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "abnChecked" }
+    },
+    {
+      "id": "gst_registered",
+      "section": "Business Checks",
+      "label": "GST registered",
+      "defaultStatus": "",
+      "rules": { "dealField": "gstRegistered" }
+    },
+    {
+      "id": "company_search_done",
+      "section": "Business Checks",
+      "label": "Company search completed",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "companySearchDone" }
+    },
+
+    {
+      "id": "equifax_clear",
+      "section": "Credit Checks",
+      "label": "Equifax clear",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "equifaxClear" }
+    },
+    {
+      "id": "adverse_media_checked",
+      "section": "Credit Checks",
+      "label": "Adverse media check",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "adverseMediaChecked" }
+    },
+
+    {
+      "id": "valuation_ordered",
+      "section": "Valuation",
+      "label": "Valuation ordered",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "valuationOrdered" }
+    },
+    {
+      "id": "valuation_received",
+      "section": "Valuation",
+      "label": "Valuation received",
+      "defaultStatus": "",
+      "rules": { "dealField": "valuationReceived" }
+    },
+
+    {
+      "id": "bank_statements_received",
+      "section": "Financials",
+      "label": "Bank statements received",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "bankStatementsReceived" }
+    },
+    {
+      "id": "income_verification_complete",
+      "section": "Financials",
+      "label": "Income verification complete",
+      "defaultStatus": "PENDING",
+      "rules": { "dealField": "incomeVerificationComplete" }
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "dealPresentationProvided": true,
+  "executedApplicationForm": true,
+  "creditConsentSigned": true,
+
+  "driversLicenseHeld": true,
+  "passportHeld": false,
+  "medicareHeld": true,
+
+  "abnChecked": true,
+  "gstRegistered": false,
+  "companySearchDone": true,
+
+  "equifaxClear": true,
+  "adverseMediaChecked": true,
+
+  "valuationOrdered": true,
+  "valuationReceived": false,
+
+  "bankStatementsReceived": true,
+  "incomeVerificationComplete": false
+}
