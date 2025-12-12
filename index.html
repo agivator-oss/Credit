@@ -10,87 +10,191 @@
   <div class="app">
     <header class="toolbar" role="banner">
       <div class="toolbar-left">
-        <div class="app-title">Private Credit — Credit Checklist</div>
-        <div class="app-subtitle">Static (open <span class="mono">index.html</span>) • No backend • No libraries</div>
+        <div class="app-title">Credit Checklist</div>
+        <div class="app-subtitle">Static (open <span class="mono">index.html</span>) • Local-only storage • No libraries</div>
       </div>
 
       <div class="toolbar-actions">
         <input id="dealFileInput" type="file" accept="application/json,.json" hidden />
         <input id="checklistImportInput" type="file" accept="application/json,.json" hidden />
+
         <button class="btn" id="btnUploadDeal" type="button">Upload Deal File</button>
         <button class="btn" id="btnLoadSample" type="button">Load Sample Deal</button>
-        <button class="btn" id="btnAudit" type="button">Checklist Audit</button>
-        <select class="select" id="sectionSelect" aria-label="Active section">
-          <option value="">Section…</option>
-        </select>
-        <button class="btn" id="btnMarkSectionComplete" type="button">Mark section COMPLETE</button>
-        <button class="btn" id="btnMarkSectionPending" type="button">Mark section PENDING</button>
-        <button class="btn" id="btnMarkAllComplete" type="button">Mark all COMPLETE</button>
-        <button class="btn" id="btnMarkAllPending" type="button">Mark all PENDING</button>
-        <span class="deal-pill" id="dealPill" aria-label="Active deal">Deal: <span class="mono" id="dealIdLabel">local-demo</span></span>
-        <button class="btn" id="btnSave" type="button">Save</button>
-        <button class="btn" id="btnReset" type="button">Reset to defaults</button>
-        <button class="btn" id="btnClearSaved" type="button">Clear saved state</button>
+        <button class="btn" id="btnAiAutofill" type="button">AI Autofill (Demo)</button>
+
         <button class="btn" id="btnImportChecklist" type="button">Import Checklist JSON</button>
-        <button class="btn" id="btnExportCsv" type="button">Export to CSV</button>
-        <button class="btn primary" id="btnExportChecklist" type="button">Export to JSON</button>
+        <button class="btn" id="btnExportCsv" type="button">Export CSV</button>
+        <button class="btn" id="btnExportChecklist" type="button">Export JSON</button>
+
+        <span class="deal-pill" aria-label="Active deal">Deal: <span class="mono" id="dealIdLabel">local-demo</span></span>
+        <button class="btn" id="btnSave" type="button">Save <span class="kbd">Ctrl</span>+<span class="kbd">S</span></button>
+
+        <button class="btn" id="btnAudit" type="button">Checklist Audit</button>
+        <button class="btn" id="btnHistory" type="button">History</button>
       </div>
     </header>
 
-    <main class="sheet" role="main" aria-label="Spreadsheet">
-      <div class="sheet-header">
-        <div class="sheet-title" aria-label="Sheet title">Credit Checklist</div>
-        <div class="sheet-meta" id="sheetMeta">Ready</div>
+    <div class="layout">
+      <!-- Deal Workspace sidebar -->
+      <aside class="sidebar" aria-label="Deal Workspace">
+        <div class="sidebar-header">
+          <strong>Deal Workspace</strong>
+          <div class="sidebar-actions">
+            <button class="btn" id="btnNewDeal" type="button">New Deal</button>
+            <button class="btn" id="btnDuplicateDeal" type="button">Duplicate</button>
+            <button class="btn danger" id="btnDeleteDeal" type="button">Delete</button>
+          </div>
+        </div>
+
+        <div class="sidebar-section">
+          <label class="label" for="dealSearch">Search deals</label>
+          <input class="input" id="dealSearch" type="text" placeholder="Type to search…" />
+        </div>
+
+        <div class="sidebar-section">
+          <div class="label-row">
+            <span class="label">Deals</span>
+            <span class="muted" id="dealCount"></span>
+          </div>
+          <div class="deal-list" id="dealList" role="listbox" aria-label="Deal list"></div>
+        </div>
+
+        <div class="sidebar-section">
+          <div class="label-row">
+            <span class="label">Attachments (local-only)</span>
+            <span class="muted">Metadata saved</span>
+          </div>
+          <div class="muted small">Files are kept in memory for this session only. <strong>Re-upload needed after refresh.</strong></div>
+
+          <input id="attachmentsInput" type="file" multiple accept="application/pdf,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,image/*" hidden />
+          <div class="row" style="margin-top:8px;">
+            <button class="btn" id="btnAddAttachment" type="button">Add attachment</button>
+            <button class="btn" id="btnClearAttachments" type="button">Clear metadata</button>
+          </div>
+
+          <div class="attachment-list" id="attachmentList" aria-label="Attachment list"></div>
+        </div>
+      </aside>
+
+      <!-- Main sheet -->
+      <main class="sheet" role="main" aria-label="Spreadsheet">
+        <div class="sheet-header">
+          <div class="sheet-title" aria-label="Sheet title">Credit Checklist</div>
+          <div class="sheet-meta" id="sheetMeta">Ready</div>
+        </div>
+
+        <div class="progress" id="progressSummary" aria-label="Progress summary"></div>
+
+        <div class="banner" id="rowCountBanner" role="status" aria-live="polite"></div>
+        <div class="banner sub" id="autofillBanner" role="status" aria-live="polite"></div>
+
+        <div class="bulk" aria-label="Bulk actions">
+          <select class="select" id="sectionSelect" aria-label="Active section">
+            <option value="">Section…</option>
+          </select>
+          <button class="btn" id="btnMarkSectionComplete" type="button">Mark section COMPLETE</button>
+          <button class="btn" id="btnMarkSectionPending" type="button">Mark section PENDING</button>
+          <button class="btn" id="btnMarkAllComplete" type="button">Mark all COMPLETE</button>
+          <button class="btn" id="btnMarkAllPending" type="button">Mark all PENDING</button>
+          <button class="btn" id="btnReset" type="button">Reset to defaults</button>
+          <button class="btn" id="btnClearSaved" type="button">Clear saved state</button>
+        </div>
+
+        <div class="grid-wrap" role="region" aria-label="Credit Checklist table" tabindex="0">
+          <table class="grid" aria-label="Credit Checklist">
+            <colgroup>
+              <col class="col-item" />
+              <col class="col-status" />
+              <col class="col-check" />
+              <col class="col-comments" />
+            </colgroup>
+            <thead>
+              <tr>
+                <th scope="col">ITEM / DESCRIPTION</th>
+                <th scope="col">STATUS</th>
+                <th scope="col">CHECK</th>
+                <th scope="col">COMMENTS</th>
+              </tr>
+            </thead>
+            <tbody id="gridBody"></tbody>
+          </table>
+        </div>
+
+        <footer class="tabs" role="navigation" aria-label="Sheets">
+          <button class="tab" type="button" data-sheet="ScenarioSub 2nd Mortgage">ScenarioSub 2nd Mortgage</button>
+          <button class="tab" type="button" data-sheet="ScenarioSub Blended Mortgage">ScenarioSub Blended Mortgage</button>
+          <button class="tab" type="button" data-sheet="Valuation Check">Valuation Check</button>
+          <button class="tab active" type="button" data-sheet="Credit Checklist" aria-current="page">Credit Checklist</button>
+          <button class="tab" type="button" data-sheet="Valuation Reliability Scorecard">Valuation Reliability Scorecard</button>
+          <button class="tab" type="button" data-sheet="SOP">SOP</button>
+          <button class="tab" type="button" data-sheet="Credit Committee Summary">Credit Committee Summary</button>
+          <button class="tab" type="button" data-sheet="Upfront Legal Fees Invoice">Upfront Legal Fees Invoice</button>
+        </footer>
+      </main>
+    </div>
+
+    <!-- Checklist Audit modal -->
+    <div class="modal" id="auditModal" aria-hidden="true" role="dialog" aria-label="Checklist Audit">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <strong>Checklist Audit</strong>
+          <div class="spacer"></div>
+          <button class="btn" id="btnAuditClose" type="button">Close <span class="kbd">Esc</span></button>
+        </div>
+        <div class="modal-body">
+          <pre class="audit-pre" id="auditOutput" aria-label="Audit output"></pre>
+        </div>
       </div>
+    </div>
 
-      <div class="banner" id="rowCountBanner" role="status" aria-live="polite"></div>
-      <div class="banner sub" id="autofillBanner" role="status" aria-live="polite"></div>
-
-      <div class="grid-wrap" role="region" aria-label="Credit Checklist table" tabindex="0">
-        <table class="grid" aria-label="Credit Checklist">
-          <colgroup>
-            <col class="col-item" />
-            <col class="col-status" />
-            <col class="col-check" />
-            <col class="col-comments" />
-          </colgroup>
-          <thead>
-            <tr>
-              <th scope="col">ITEM / DESCRIPTION</th>
-              <th scope="col">STATUS</th>
-              <th scope="col">CHECK</th>
-              <th scope="col">COMMENTS</th>
-            </tr>
-          </thead>
-          <tbody id="gridBody">
-            <!-- rendered by app.js -->
-          </tbody>
-        </table>
+    <!-- History modal -->
+    <div class="modal" id="historyModal" aria-hidden="true" role="dialog" aria-label="History">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <strong>History</strong>
+          <div class="spacer"></div>
+          <button class="btn" id="btnHistoryClose" type="button">Close <span class="kbd">Esc</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div>
+              <label class="label" for="historyFilter">Filter</label>
+              <input class="input" id="historyFilter" type="text" placeholder="itemId contains…" />
+            </div>
+            <div>
+              <label class="label" for="historyField">Field</label>
+              <select class="select" id="historyField">
+                <option value="">All</option>
+                <option value="status">status</option>
+                <option value="comment">comment</option>
+              </select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="btnHistoryExport" type="button">Export History JSON</button>
+            <button class="btn" id="btnHistoryClear" type="button">Clear History</button>
+          </div>
+          <pre class="audit-pre" id="historyOutput" aria-label="History output" style="margin-top:10px;"></pre>
+        </div>
       </div>
-    </main>
+    </div>
 
-    <footer class="tabs" role="navigation" aria-label="Sheets">
-      <button class="tab" type="button" data-sheet="ScenarioSub 2nd Mortgage">ScenarioSub 2nd Mortgage</button>
-      <button class="tab" type="button" data-sheet="ScenarioSub Blended Mortgage">ScenarioSub Blended Mortgage</button>
-      <button class="tab" type="button" data-sheet="Valuation Check">Valuation Check</button>
-      <button class="tab active" type="button" data-sheet="Credit Checklist" aria-current="page">Credit Checklist</button>
-      <button class="tab" type="button" data-sheet="Valuation Reliability Scorecard">Valuation Reliability Scorecard</button>
-      <button class="tab" type="button" data-sheet="SOP">SOP</button>
-      <button class="tab" type="button" data-sheet="Credit Committee Summary">Credit Committee Summary</button>
-      <button class="tab" type="button" data-sheet="Upfront Legal Fees Invoice">Upfront Legal Fees Invoice</button>
-    </footer>
-  </div>
-
-  <!-- Checklist Audit modal -->
-  <div class="modal" id="auditModal" aria-hidden="true" role="dialog" aria-label="Checklist Audit">
-    <div class="modal-panel">
-      <div class="modal-header">
-        <strong>Checklist Audit</strong>
-        <div class="spacer"></div>
-        <button class="btn" id="btnAuditClose" type="button">Close</button>
-      </div>
-      <div class="modal-body">
-        <pre class="audit-pre" id="auditOutput" aria-label="Audit output"></pre>
+    <!-- AI Autofill preview modal -->
+    <div class="modal" id="aiModal" aria-hidden="true" role="dialog" aria-label="AI Autofill Preview">
+      <div class="modal-panel">
+        <div class="modal-header">
+          <strong>AI Autofill Preview (Demo)</strong>
+          <div class="spacer"></div>
+          <button class="btn" id="btnAiClose" type="button">Close <span class="kbd">Esc</span></button>
+        </div>
+        <div class="modal-body">
+          <div class="muted small">This is a demo preview. It simulates extraction and proposes status changes.</div>
+          <div class="row" style="margin-top:10px;">
+            <button class="btn" id="btnAiApply" type="button">Apply</button>
+            <button class="btn" id="btnAiCancel" type="button">Cancel</button>
+          </div>
+          <pre class="audit-pre" id="aiOutput" aria-label="AI preview output" style="margin-top:10px;"></pre>
+        </div>
       </div>
     </div>
   </div>
