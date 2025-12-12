@@ -18,7 +18,13 @@
         <input id="dealFileInput" type="file" accept="application/json,.json" hidden />
         <button class="btn" id="btnUploadDeal" type="button">Upload Deal File</button>
         <button class="btn" id="btnLoadSample" type="button">Load Sample Deal</button>
-        <button class="btn primary" id="btnExportChecklist" type="button">Export Checklist</button>
+        <button class="btn" id="btnAudit" type="button">Checklist Audit</button>
+        <span class="deal-pill" id="dealPill" aria-label="Active deal">Deal: <span class="mono" id="dealIdLabel">local-demo</span></span>
+        <button class="btn" id="btnSave" type="button">Save</button>
+        <button class="btn" id="btnReset" type="button">Reset to defaults</button>
+        <button class="btn" id="btnClearSaved" type="button">Clear saved state</button>
+        <button class="btn" id="btnExportCsv" type="button">Export to CSV</button>
+        <button class="btn primary" id="btnExportChecklist" type="button">Export to JSON</button>
       </div>
     </header>
 
@@ -29,6 +35,7 @@
       </div>
 
       <div class="banner" id="rowCountBanner" role="status" aria-live="polite"></div>
+      <div class="banner sub" id="autofillBanner" role="status" aria-live="polite"></div>
 
       <div class="grid-wrap" role="region" aria-label="Credit Checklist table" tabindex="0">
         <table class="grid" aria-label="Credit Checklist">
@@ -63,6 +70,20 @@
       <button class="tab" type="button" data-sheet="Credit Committee Summary">Credit Committee Summary</button>
       <button class="tab" type="button" data-sheet="Upfront Legal Fees Invoice">Upfront Legal Fees Invoice</button>
     </footer>
+  </div>
+
+  <!-- Checklist Audit modal -->
+  <div class="modal" id="auditModal" aria-hidden="true" role="dialog" aria-label="Checklist Audit">
+    <div class="modal-panel">
+      <div class="modal-header">
+        <strong>Checklist Audit</strong>
+        <div class="spacer"></div>
+        <button class="btn" id="btnAuditClose" type="button">Close</button>
+      </div>
+      <div class="modal-body">
+        <pre class="audit-pre" id="auditOutput" aria-label="Audit output"></pre>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="./app.js"></script>

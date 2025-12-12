@@ -118,6 +118,7 @@ const FALLBACK_CHECKLIST = {
 };
 
 const FALLBACK_SAMPLE_DEAL = {
+  dealId: 'sample-001',
   dealPresentationProvided: true,
   simSheetProvided: true,
   driversLicenceHeld: true,
@@ -259,6 +260,7 @@ const state = {
   checklist: null,
   rows: new Map(), // id -> { id, section, label, status, comments }
   lastDeal: null,
+  activeDealId: 'local-demo',
 };
 
 function $(id){
@@ -268,6 +270,23 @@ function $(id){
 function setMeta(text){
   const el = $('sheetMeta');
   if (el) el.textContent = text;
+}
+
+function setAutofillBanner(text){
+  const el = $('autofillBanner');
+  if (el) el.textContent = text || '';
+}
+
+function setActiveDealId(dealId){
+  const id = (dealId && String(dealId).trim()) ? String(dealId).trim() : 'local-demo';
+  state.activeDealId = id;
+  const label = $('dealIdLabel');
+  if (label) label.textContent = id;
+}
+
+function storageKeyForDeal(dealId){
+  const id = (dealId && String(dealId).trim()) ? String(dealId).trim() : 'local-demo';
+  return `creditChecklist:${id}`;
 }
 
 async function loadJson(url, fallback){
@@ -281,6 +300,12 @@ async function loadJson(url, fallback){
 }
 
 function computeCheckResult(status){
+  // Excel-like logic:
+  // - blank => blank
+  // - PENDING => Incomplete
+  // - COMPLETE => Complete
+  // - N/A => blank
+  if (!status) return '';
   if (status === 'PENDING') return 'Incomplete';
   if (status === 'COMPLETE') return 'Complete';
   return '';
@@ -411,6 +436,84 @@ function initRowsFromChecklist(checklist){
   }
 }
 
+function applySavedState(dealId){
+  const key = storageKeyForDeal(dealId);
+  const raw = localStorage.getItem(key);
+  if (!raw) return { loaded: false };
+
+  try{
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object' || !parsed.rows || typeof parsed.rows !== 'object') return { loaded: false };
+
+    for (const [id, rowPatch] of Object.entries(parsed.rows)){
+      if (!state.rows.has(id)) continue;
+      const current = state.rows.get(id);
+      const status = typeof rowPatch.status === 'string' ? rowPatch.status : current.status;
+      const comments = typeof rowPatch.comments === 'string' ? rowPatch.comments : current.comments;
+      state.rows.set(id, { ...current, status, comments });
+    }
+
+    // sync DOM if table already rendered
+    for (const [id, r] of state.rows.entries()){
+      const tr = document.querySelector(`tr[data-row-id="${cssEscape(id)}"]`);
+      if (!tr) continue;
+      const sel = tr.querySelector('select.status-select');
+      const input = tr.querySelector('input.comment-input');
+      if (sel) sel.value = r.status || '';
+      if (input) input.value = r.comments || '';
+      renderRowCells(id);
+    }
+
+    setMeta(`Loaded saved state (${key})`);
+    return { loaded: true };
+  } catch (_err){
+    return { loaded: false };
+  }
+}
+
+function saveState(){
+  const dealId = state.activeDealId || 'local-demo';
+  const key = storageKeyForDeal(dealId);
+  const rowsOut = {};
+  for (const [id, r] of state.rows.entries()){
+    rowsOut[id] = { status: r.status || '', comments: r.comments || '' };
+  }
+  const payload = { dealId, savedAt: new Date().toISOString(), rows: rowsOut };
+  localStorage.setItem(key, JSON.stringify(payload));
+  setMeta(`Saved (${key})`);
+}
+
+function clearSavedState(){
+  const dealId = state.activeDealId || 'local-demo';
+  const key = storageKeyForDeal(dealId);
+  localStorage.removeItem(key);
+  setMeta(`Cleared saved state (${key})`);
+}
+
+function resetToDefaults(){
+  if (!state.checklist) return;
+  for (const r of state.checklist.rows){
+    const current = state.rows.get(r.id);
+    if (!current) continue;
+    state.rows.set(r.id, { ...current, status: r.statusDefault || 'PENDING', comments: '' });
+  }
+
+  // Sync DOM
+  for (const [id, r] of state.rows.entries()){
+    const tr = document.querySelector(`tr[data-row-id="${cssEscape(id)}"]`);
+    if (!tr) continue;
+    const sel = tr.querySelector('select.status-select');
+    const input = tr.querySelector('input.comment-input');
+    if (sel) sel.value = r.status || '';
+    if (input) input.value = r.comments || '';
+    renderRowCells(id);
+  }
+
+  setMeta('Reset to defaults');
+  setAutofillBanner('');
+  verifyRowCounts();
+}
+
 function verifyRowCounts(){
   const banner = $('rowCountBanner');
   if (!banner || !state.checklist) return;
@@ -446,10 +549,26 @@ function renderTable(checklist){
   verifyRowCounts();
 }
 
+function computeAutofillCoverage(deal){
+  const mappingKeys = Object.keys(DEAL_KEY_TO_ITEM_ID);
+  const found = [];
+  const missing = [];
+  for (const k of mappingKeys){
+    if (k in deal) found.push(k);
+    else missing.push(k);
+  }
+  const unmapped = [];
+  for (const k of Object.keys(deal)){
+    if (!(k in DEAL_KEY_TO_ITEM_ID)) unmapped.push(k);
+  }
+  return { found, missing, unmapped };
+}
+
 function applyDealToChecklist(deal){
   if (!state.checklist) return;
 
   state.lastDeal = deal;
+  setActiveDealId(deal?.dealId || 'local-demo');
 
   for (const [dealKey, itemId] of Object.entries(DEAL_KEY_TO_ITEM_ID)){
     if (!(dealKey in deal)) continue; // missing => leave default
@@ -467,7 +586,17 @@ function applyDealToChecklist(deal){
     }
   }
 
+  const coverage = computeAutofillCoverage(deal);
+  setAutofillBanner(
+    `Autofill: mapped fields found ${coverage.found.length}, missing ${coverage.missing.length}. ` +
+    `Missing keys: ${coverage.missing.slice(0, 12).join(', ')}${coverage.missing.length > 12 ? '…' : ''} ` +
+    `| Unmapped deal keys: ${coverage.unmapped.slice(0, 12).join(', ')}${coverage.unmapped.length > 12 ? '…' : ''}`
+  );
+
   setMeta('Autofill applied');
+
+  // If there is saved state for this dealId, apply it on top of autofill.
+  applySavedState(state.activeDealId);
 }
 
 function exportChecklist(){
@@ -497,8 +626,45 @@ function exportChecklist(){
   setMeta('Exported');
 }
 
+function exportChecklistCsv(){
+  const rows = [];
+  rows.push(['Section','Label','Status','Check','Comments']);
+
+  for (const r of state.checklist.rows){
+    const s = state.rows.get(r.id);
+    const status = (s.status || '');
+    const check = computeCheckResult(status);
+    rows.push([s.section, s.label, status, check, s.comments || '']);
+  }
+
+  const csv = toCsv(rows);
+  downloadText('credit-checklist.export.csv', csv, 'text/csv');
+  setMeta('Exported CSV');
+}
+
+function toCsv(rows){
+  const esc = (v) => {
+    const s = String(v ?? '');
+    if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g,'""')}"`;
+    return s;
+  };
+  return rows.map(r => r.map(esc).join(',')).join('\n');
+}
+
 function downloadJson(filename, obj){
   const blob = new Blob([JSON.stringify(obj, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+function downloadText(filename, content, mime){
+  const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -516,6 +682,69 @@ async function handleDealUpload(file){
   applyDealToChecklist(deal);
 }
 
+function computeChecklistAudit(){
+  const expectedIds = (state.checklist?.rows || []).map(r => r.id);
+  const expectedSet = new Set(expectedIds);
+
+  const renderedEls = [...document.querySelectorAll('tr[data-row-id]')];
+  const renderedIds = renderedEls.map(el => el.getAttribute('data-row-id') || '');
+  const renderedSet = new Set(renderedIds);
+
+  const missing = expectedIds.filter(id => !renderedSet.has(id));
+
+  const counts = new Map();
+  for (const id of renderedIds){
+    counts.set(id, (counts.get(id) || 0) + 1);
+  }
+  const duplicates = [...counts.entries()].filter(([,c]) => c > 1).map(([id, c]) => `${id} (x${c})`);
+
+  return {
+    expected: expectedIds.length,
+    rendered: renderedEls.length,
+    missing,
+    duplicates
+  };
+}
+
+function openAuditModal(){
+  const modal = $('auditModal');
+  const out = $('auditOutput');
+  if (!modal || !out) return;
+
+  const audit = computeChecklistAudit();
+  out.textContent =
+    `Total items expected (JSON): ${audit.expected}\n` +
+    `Total items rendered (DOM): ${audit.rendered}\n\n` +
+    `Missing item IDs (${audit.missing.length}):\n` +
+    (audit.missing.length ? audit.missing.map(x => `- ${x}`).join('\n') : '- (none)') +
+    `\n\nDuplicate DOM item IDs (${audit.duplicates.length}):\n` +
+    (audit.duplicates.length ? audit.duplicates.map(x => `- ${x}`).join('\n') : '- (none)') +
+    `\n`;
+
+  modal.setAttribute('aria-hidden','false');
+}
+
+function closeAuditModal(){
+  const modal = $('auditModal');
+  if (!modal) return;
+  modal.setAttribute('aria-hidden','true');
+}
+
+function runCheckColumnTests(){
+  const cases = [
+    { status: '', expected: '' },
+    { status: 'PENDING', expected: 'Incomplete' },
+    { status: 'COMPLETE', expected: 'Complete' },
+    { status: 'N/A', expected: '' },
+  ];
+  for (const c of cases){
+    const got = computeCheckResult(c.status);
+    if (got !== c.expected){
+      throw new Error(`CHECK test failed: status=${JSON.stringify(c.status)} expected=${JSON.stringify(c.expected)} got=${JSON.stringify(got)}`);
+    }
+  }
+}
+
 function initTabs(){
   document.querySelectorAll('.tab').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -531,6 +760,7 @@ function initTabs(){
 
 async function main(){
   initTabs();
+  runCheckColumnTests();
 
   // wire buttons
   $('btnUploadDeal').addEventListener('click', () => $('dealFileInput').click());
@@ -552,6 +782,21 @@ async function main(){
   });
 
   $('btnExportChecklist').addEventListener('click', exportChecklist);
+  $('btnExportCsv').addEventListener('click', exportChecklistCsv);
+
+  $('btnSave').addEventListener('click', saveState);
+  $('btnReset').addEventListener('click', () => {
+    if (confirm('Reset all rows to defaults and clear comments?')) resetToDefaults();
+  });
+  $('btnClearSaved').addEventListener('click', () => {
+    if (confirm('Clear saved state for the current dealId?')) clearSavedState();
+  });
+
+  $('btnAudit').addEventListener('click', openAuditModal);
+  $('btnAuditClose').addEventListener('click', closeAuditModal);
+  $('auditModal').addEventListener('click', (e) => {
+    if (e.target && e.target.id === 'auditModal') closeAuditModal();
+  });
 
   // load checklist template
   setMeta('Loading checklist…');
@@ -559,6 +804,10 @@ async function main(){
   state.checklist = checklist;
   initRowsFromChecklist(checklist);
   renderTable(checklist);
+  setActiveDealId('local-demo');
+  applySavedState('local-demo');
+  verifyRowCounts();
+  setAutofillBanner('');
   setMeta('Ready');
 }
 

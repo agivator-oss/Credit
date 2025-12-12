@@ -57,6 +57,16 @@ body{
 
 .toolbar-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 
+.deal-pill{
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border: 1px solid var(--grid-line);
+  background: #fff;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
 .btn{
   appearance:none;
   border: 1px solid var(--grid-line);
@@ -102,6 +112,12 @@ body{
   padding: 6px 10px;
   font-size: 12px;
   color: #333;
+}
+
+.banner.sub{
+  border-top: none;
+  border-bottom: 1px solid var(--grid-line);
+  color: var(--muted);
 }
 
 .banner.ok{ color: #1b5e20; }
@@ -212,4 +228,45 @@ body{
   background: var(--tab-active);
   border-bottom-color: var(--tab-active);
   font-weight: 700;
+}
+
+/* Modal */
+.modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,.35);
+  padding: 14px;
+  z-index: 999;
+}
+.modal[aria-hidden="false"]{ display:flex; }
+.modal-panel{
+  width: min(980px, 100%);
+  max-height: min(80vh, 720px);
+  display:flex;
+  flex-direction:column;
+  background: #fff;
+  border: 1px solid var(--grid-line);
+  box-shadow: 0 10px 30px rgba(0,0,0,.20);
+}
+.modal-header{
+  display:flex;
+  align-items:center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--grid-line);
+  background: var(--header-bg);
+}
+.modal-body{
+  padding: 10px 12px;
+  overflow:auto;
+}
+.audit-pre{
+  margin:0;
+  white-space: pre-wrap;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.45;
 }
