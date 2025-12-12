@@ -16,13 +16,22 @@
 
       <div class="toolbar-actions">
         <input id="dealFileInput" type="file" accept="application/json,.json" hidden />
+        <input id="checklistImportInput" type="file" accept="application/json,.json" hidden />
         <button class="btn" id="btnUploadDeal" type="button">Upload Deal File</button>
         <button class="btn" id="btnLoadSample" type="button">Load Sample Deal</button>
         <button class="btn" id="btnAudit" type="button">Checklist Audit</button>
+        <select class="select" id="sectionSelect" aria-label="Active section">
+          <option value="">Section…</option>
+        </select>
+        <button class="btn" id="btnMarkSectionComplete" type="button">Mark section COMPLETE</button>
+        <button class="btn" id="btnMarkSectionPending" type="button">Mark section PENDING</button>
+        <button class="btn" id="btnMarkAllComplete" type="button">Mark all COMPLETE</button>
+        <button class="btn" id="btnMarkAllPending" type="button">Mark all PENDING</button>
         <span class="deal-pill" id="dealPill" aria-label="Active deal">Deal: <span class="mono" id="dealIdLabel">local-demo</span></span>
         <button class="btn" id="btnSave" type="button">Save</button>
         <button class="btn" id="btnReset" type="button">Reset to defaults</button>
         <button class="btn" id="btnClearSaved" type="button">Clear saved state</button>
+        <button class="btn" id="btnImportChecklist" type="button">Import Checklist JSON</button>
         <button class="btn" id="btnExportCsv" type="button">Export to CSV</button>
         <button class="btn primary" id="btnExportChecklist" type="button">Export to JSON</button>
       </div>

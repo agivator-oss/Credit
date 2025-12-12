@@ -57,6 +57,13 @@ body{
 
 .toolbar-actions{ display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end; }
 
+.select{
+  border: 1px solid var(--grid-line);
+  background: #fff;
+  padding: 7px 10px;
+  font-size: 12px;
+}
+
 .deal-pill{
   display:inline-flex;
   align-items:center;
@@ -144,6 +151,27 @@ body{
   border-bottom: 1px solid var(--grid-line);
 }
 
+.grid thead th:first-child{
+  left: 0;
+  z-index: 4;
+  position: sticky;
+  background: var(--header-bg);
+}
+
+.grid td:first-child{
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  background: #fff;
+}
+
+.grid tbody tr:not(.tr-section):hover td{
+  background: #f6f9ff;
+}
+.grid tbody tr:not(.tr-section):hover td:first-child{
+  background: #f6f9ff;
+}
+
 .grid th, .grid td{
   border: 1px solid var(--grid-line);
   padding: 6px 8px;
@@ -176,6 +204,7 @@ body{
 /* Status cell conditional formatting */
 .status-cell{
   font-weight: 700;
+  text-align: center;
 }
 .status-pending{ background: var(--pending) !important; }
 .status-complete{ background: var(--complete) !important; }
@@ -188,6 +217,7 @@ body{
   font: inherit;
   font-weight: 700;
   outline: none;
+  text-align: center;
 }
 
 .check-cell{
@@ -228,6 +258,7 @@ body{
   background: var(--tab-active);
   border-bottom-color: var(--tab-active);
   font-weight: 700;
+  box-shadow: inset 0 2px 0 rgba(0,0,0,.08);
 }
 
 /* Modal */

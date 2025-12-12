@@ -261,6 +261,7 @@ const state = {
   rows: new Map(), // id -> { id, section, label, status, comments }
   lastDeal: null,
   activeDealId: 'local-demo',
+  checklistVersionHash: null,
 };
 
 function $(id){
@@ -287,6 +288,42 @@ function setActiveDealId(dealId){
 function storageKeyForDeal(dealId){
   const id = (dealId && String(dealId).trim()) ? String(dealId).trim() : 'local-demo';
   return `creditChecklist:${id}`;
+}
+
+function fnv1a32(str){
+  // Deterministic non-crypto hash for versioning/export.
+  let h = 0x811c9dc5;
+  for (let i = 0; i < str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = (h * 0x01000193) >>> 0;
+  }
+  return ('00000000' + h.toString(16)).slice(-8);
+}
+
+function safeLocalStorage(){
+  try{
+    if (!('localStorage' in window)) return null;
+    // test write
+    const k = '__cc_test__';
+    localStorage.setItem(k, '1');
+    localStorage.removeItem(k);
+    return localStorage;
+  } catch (_err){
+    return null;
+  }
+}
+
+const LS = safeLocalStorage();
+
+let autosaveTimer = null;
+function scheduleAutosave(){
+  if (!LS) return;
+  clearTimeout(autosaveTimer);
+  autosaveTimer = setTimeout(() => {
+    try{
+      saveState({ silent: true });
+    } catch (_err) {}
+  }, 500);
 }
 
 async function loadJson(url, fallback){
@@ -357,6 +394,7 @@ function createChecklistRow(row){
     updateRowState(row.id, { status: select.value });
     renderRowCells(row.id);
     setMeta(`Edited: ${row.label}`);
+    scheduleAutosave();
   });
 
   tdStatus.appendChild(select);
@@ -379,6 +417,7 @@ function createChecklistRow(row){
   input.setAttribute('aria-label', `Comments for ${row.label}`);
   input.addEventListener('input', () => {
     updateRowState(row.id, { comments: input.value });
+    scheduleAutosave();
   });
   input.addEventListener('blur', () => {
     setMeta('Ready');
@@ -438,7 +477,8 @@ function initRowsFromChecklist(checklist){
 
 function applySavedState(dealId){
   const key = storageKeyForDeal(dealId);
-  const raw = localStorage.getItem(key);
+  if (!LS) return { loaded: false };
+  const raw = LS.getItem(key);
   if (!raw) return { loaded: false };
 
   try{
@@ -471,22 +511,27 @@ function applySavedState(dealId){
   }
 }
 
-function saveState(){
+function saveState(_opts){
   const dealId = state.activeDealId || 'local-demo';
   const key = storageKeyForDeal(dealId);
   const rowsOut = {};
   for (const [id, r] of state.rows.entries()){
     rowsOut[id] = { status: r.status || '', comments: r.comments || '' };
   }
-  const payload = { dealId, savedAt: new Date().toISOString(), rows: rowsOut };
-  localStorage.setItem(key, JSON.stringify(payload));
+  const payload = {
+    dealId,
+    savedAt: new Date().toISOString(),
+    checklistVersion: state.checklistVersionHash,
+    rows: rowsOut
+  };
+  if (LS) LS.setItem(key, JSON.stringify(payload));
   setMeta(`Saved (${key})`);
 }
 
 function clearSavedState(){
   const dealId = state.activeDealId || 'local-demo';
   const key = storageKeyForDeal(dealId);
-  localStorage.removeItem(key);
+  if (LS) LS.removeItem(key);
   setMeta(`Cleared saved state (${key})`);
 }
 
@@ -549,6 +594,75 @@ function renderTable(checklist){
   verifyRowCounts();
 }
 
+function populateSectionSelect(){
+  const sel = $('sectionSelect');
+  if (!sel || !state.checklist) return;
+  const sections = [];
+  const seen = new Set();
+  for (const r of state.checklist.rows){
+    if (!seen.has(r.section)){
+      seen.add(r.section);
+      sections.push(r.section);
+    }
+  }
+  sel.innerHTML = '<option value=\"\">Section…</option>' + sections.map(s => `<option value=\"${escapeHtmlAttr(s)}\">${escapeHtmlText(s)}</option>`).join('');
+}
+
+function escapeHtmlText(s){
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function escapeHtmlAttr(s){
+  return escapeHtmlText(s).replace(/\"/g,'&quot;');
+}
+
+function currentSectionFromFocus(){
+  const active = document.activeElement;
+  if (!active) return null;
+  const tr = active.closest && active.closest('tr[data-row-id]');
+  if (!tr) return null;
+  const id = tr.getAttribute('data-row-id');
+  const row = state.rows.get(id);
+  return row ? row.section : null;
+}
+
+function setSectionSelectTo(section){
+  const sel = $('sectionSelect');
+  if (!sel) return;
+  if (section && [...sel.options].some(o => o.value === section)) sel.value = section;
+}
+
+function markSection(section, status){
+  if (!state.checklist) return;
+  if (!section) return;
+  for (const r of state.checklist.rows){
+    if (r.section !== section) continue;
+    updateRowState(r.id, { status });
+    const tr = document.querySelector(`tr[data-row-id="${cssEscape(r.id)}"]`);
+    if (tr){
+      const sel = tr.querySelector('select.status-select');
+      if (sel) sel.value = status;
+      renderRowCells(r.id);
+    }
+  }
+  setMeta(`Marked section: ${section} = ${status}`);
+  scheduleAutosave();
+}
+
+function markAll(status){
+  if (!state.checklist) return;
+  for (const r of state.checklist.rows){
+    updateRowState(r.id, { status });
+    const tr = document.querySelector(`tr[data-row-id="${cssEscape(r.id)}"]`);
+    if (tr){
+      const sel = tr.querySelector('select.status-select');
+      if (sel) sel.value = status;
+      renderRowCells(r.id);
+    }
+  }
+  setMeta(`Marked all = ${status}`);
+  scheduleAutosave();
+}
+
 function computeAutofillCoverage(deal){
   const mappingKeys = Object.keys(DEAL_KEY_TO_ITEM_ID);
   const found = [];
@@ -597,6 +711,7 @@ function applyDealToChecklist(deal){
 
   // If there is saved state for this dealId, apply it on top of autofill.
   applySavedState(state.activeDealId);
+  scheduleAutosave();
 }
 
 function exportChecklist(){
@@ -618,6 +733,8 @@ function exportChecklist(){
     sheet: state.checklist.sheet,
     version: state.checklist.version,
     exportedAt: new Date().toISOString(),
+    dealId: state.activeDealId || (state.lastDeal?.dealId ?? 'local-demo'),
+    checklistVersion: state.checklistVersionHash,
     lastDeal: state.lastDeal || null,
     rows: exportedRows
   };
@@ -680,6 +797,37 @@ async function handleDealUpload(file){
   const text = await file.text();
   const deal = JSON.parse(text);
   applyDealToChecklist(deal);
+}
+
+async function importChecklistJsonFile(file){
+  if (!file) return;
+  const text = await file.text();
+  const payload = JSON.parse(text);
+  if (!payload || typeof payload !== 'object' || !Array.isArray(payload.rows)) throw new Error('Invalid checklist JSON.');
+
+  const incomingDealId = payload.dealId || payload.lastDeal?.dealId || 'local-demo';
+  setActiveDealId(incomingDealId);
+
+  // apply rows by id
+  for (const row of payload.rows){
+    if (!row || typeof row !== 'object') continue;
+    if (!row.id || !state.rows.has(row.id)) continue;
+    updateRowState(row.id, { status: row.status ?? '', comments: row.comments ?? '' });
+  }
+
+  // sync DOM
+  for (const [id, r] of state.rows.entries()){
+    const tr = document.querySelector(`tr[data-row-id="${cssEscape(id)}"]`);
+    if (!tr) continue;
+    const sel = tr.querySelector('select.status-select');
+    const input = tr.querySelector('input.comment-input');
+    if (sel) sel.value = r.status || '';
+    if (input) input.value = r.comments || '';
+    renderRowCells(id);
+  }
+
+  setMeta('Imported checklist JSON');
+  scheduleAutosave();
 }
 
 function computeChecklistAudit(){
@@ -745,6 +893,71 @@ function runCheckColumnTests(){
   }
 }
 
+function initKeyboardNav(){
+  const body = $('gridBody');
+  if (!body) return;
+
+  // Arrow keys move between editable cells (status/comments).
+  document.addEventListener('keydown', (e) => {
+    // Global shortcuts
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's'){
+      e.preventDefault();
+      saveState({ silent: false });
+      return;
+    }
+    if (e.key === 'Escape'){
+      // close modals
+      const modal = $('auditModal');
+      if (modal && modal.getAttribute('aria-hidden') === 'false'){
+        closeAuditModal();
+        e.preventDefault();
+      }
+      return;
+    }
+
+    const active = document.activeElement;
+    if (!active) return;
+    const isEditable = active.classList.contains('status-select') || active.classList.contains('comment-input');
+    if (!isEditable) return;
+
+    const tr = active.closest('tr[data-row-id]');
+    if (!tr) return;
+    const rowId = tr.getAttribute('data-row-id');
+    const section = state.rows.get(rowId)?.section;
+    if (section) setSectionSelectTo(section);
+
+    const rows = [...document.querySelectorAll('tr[data-row-id]')];
+    const rowIndex = rows.indexOf(tr);
+    if (rowIndex < 0) return;
+
+    const colIndex = active.classList.contains('status-select') ? 0 : 1; // 0=status, 1=comments
+
+    const focusCell = (rIdx, cIdx) => {
+      const targetRow = rows[Math.max(0, Math.min(rows.length - 1, rIdx))];
+      if (!targetRow) return;
+      const target = cIdx === 0
+        ? targetRow.querySelector('select.status-select')
+        : targetRow.querySelector('input.comment-input');
+      if (target){ target.focus(); target.select?.(); }
+    };
+
+    // Arrow navigation
+    if (e.key === 'ArrowUp'){ e.preventDefault(); focusCell(rowIndex - 1, colIndex); return; }
+    if (e.key === 'ArrowDown'){ e.preventDefault(); focusCell(rowIndex + 1, colIndex); return; }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); focusCell(rowIndex, 0); return; }
+    if (e.key === 'ArrowRight'){ e.preventDefault(); focusCell(rowIndex, 1); return; }
+
+    // Enter behavior:
+    // - On status: go to comments same row
+    // - On comments: go to next row status
+    if (e.key === 'Enter'){
+      e.preventDefault();
+      if (colIndex === 0) focusCell(rowIndex, 1);
+      else focusCell(rowIndex + 1, 0);
+    }
+  });
+}
+
 function initTabs(){
   document.querySelectorAll('.tab').forEach((btn) => {
     btn.addEventListener('click', () => {
@@ -761,6 +974,7 @@ function initTabs(){
 async function main(){
   initTabs();
   runCheckColumnTests();
+  initKeyboardNav();
 
   // wire buttons
   $('btnUploadDeal').addEventListener('click', () => $('dealFileInput').click());
@@ -784,12 +998,25 @@ async function main(){
   $('btnExportChecklist').addEventListener('click', exportChecklist);
   $('btnExportCsv').addEventListener('click', exportChecklistCsv);
 
-  $('btnSave').addEventListener('click', saveState);
+  $('btnSave').addEventListener('click', () => saveState({ silent: false }));
   $('btnReset').addEventListener('click', () => {
     if (confirm('Reset all rows to defaults and clear comments?')) resetToDefaults();
   });
   $('btnClearSaved').addEventListener('click', () => {
     if (confirm('Clear saved state for the current dealId?')) clearSavedState();
+  });
+
+  $('btnImportChecklist').addEventListener('click', () => $('checklistImportInput').click());
+  $('checklistImportInput').addEventListener('change', async (e) => {
+    const file = e.target.files && e.target.files[0];
+    try{
+      await importChecklistJsonFile(file);
+    } catch (err){
+      alert('Could not import checklist JSON.');
+      console.error(err);
+    } finally {
+      e.target.value = '';
+    }
   });
 
   $('btnAudit').addEventListener('click', openAuditModal);
@@ -798,12 +1025,29 @@ async function main(){
     if (e.target && e.target.id === 'auditModal') closeAuditModal();
   });
 
+  $('btnMarkSectionComplete').addEventListener('click', () => {
+    const sel = $('sectionSelect');
+    const section = sel?.value || currentSectionFromFocus();
+    if (!section){ alert('Select a section first.'); return; }
+    markSection(section, 'COMPLETE');
+  });
+  $('btnMarkSectionPending').addEventListener('click', () => {
+    const sel = $('sectionSelect');
+    const section = sel?.value || currentSectionFromFocus();
+    if (!section){ alert('Select a section first.'); return; }
+    markSection(section, 'PENDING');
+  });
+  $('btnMarkAllComplete').addEventListener('click', () => markAll('COMPLETE'));
+  $('btnMarkAllPending').addEventListener('click', () => markAll('PENDING'));
+
   // load checklist template
   setMeta('Loading checklist…');
   const checklist = await loadJson(CHECKLIST_URL, FALLBACK_CHECKLIST);
   state.checklist = checklist;
+  state.checklistVersionHash = fnv1a32(JSON.stringify(checklist.rows));
   initRowsFromChecklist(checklist);
   renderTable(checklist);
+  populateSectionSelect();
   setActiveDealId('local-demo');
   applySavedState('local-demo');
   verifyRowCounts();
