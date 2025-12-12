@@ -95,6 +95,18 @@ body{
   color: var(--muted);
 }
 
+.banner{
+  background: var(--sheet-bg);
+  border: 1px solid var(--grid-line);
+  border-top: none;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: #333;
+}
+
+.banner.ok{ color: #1b5e20; }
+.banner.bad{ color: #8a1f11; }
+
 .grid-wrap{
   background: var(--sheet-bg);
   border: 1px solid var(--grid-line);

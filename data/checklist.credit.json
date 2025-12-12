@@ -3,115 +3,107 @@
   "version": "1.0",
   "columns": ["Item/Description", "Status", "CHECK", "COMMENTS"],
   "rows": [
-    {
-      "id": "deal_presentation_provided",
-      "section": "Application",
-      "label": "Deal presentation provided",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "dealPresentationProvided" }
-    },
-    {
-      "id": "executed_application_form",
-      "section": "Application",
-      "label": "Executed Application form",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "executedApplicationForm" }
-    },
-    {
-      "id": "credit_consent_signed",
-      "section": "Application",
-      "label": "Credit check consent signed",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "creditConsentSigned" }
-    },
+    { "id": "deal_presentation_deal_presentation", "section": "Deal Presentation", "label": "Deal Presentation", "statusDefault": "PENDING" },
+    { "id": "deal_presentation_sim_sheet", "section": "Deal Presentation", "label": "Supplementary Information Memorandum Sheet", "statusDefault": "PENDING" },
 
-    {
-      "id": "drivers_license_held",
-      "section": "KYC / Identification",
-      "label": "Driver's licence held",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "driversLicenseHeld" }
-    },
-    {
-      "id": "passport_held",
-      "section": "KYC / Identification",
-      "label": "Passport held",
-      "defaultStatus": "",
-      "rules": { "dealField": "passportHeld" }
-    },
-    {
-      "id": "medicare_held",
-      "section": "KYC / Identification",
-      "label": "Medicare card held",
-      "defaultStatus": "",
-      "rules": { "dealField": "medicareHeld" }
-    },
+    { "id": "id_current_drivers_licence_held", "section": "Driver’s License, Passport & Medicare", "label": "Current Driver’s Licence held", "statusDefault": "PENDING" },
+    { "id": "id_current_passport_held", "section": "Driver’s License, Passport & Medicare", "label": "Current Passport held", "statusDefault": "PENDING" },
+    { "id": "id_current_medicare_held", "section": "Driver’s License, Passport & Medicare", "label": "Current Medicare held", "statusDefault": "PENDING" },
+    { "id": "id_alternate_id_100_points", "section": "Driver’s License, Passport & Medicare", "label": "Alternate acceptable ID held up to 100 points", "statusDefault": "PENDING" },
 
-    {
-      "id": "abn_checked",
-      "section": "Business Checks",
-      "label": "ABN checked",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "abnChecked" }
-    },
-    {
-      "id": "gst_registered",
-      "section": "Business Checks",
-      "label": "GST registered",
-      "defaultStatus": "",
-      "rules": { "dealField": "gstRegistered" }
-    },
-    {
-      "id": "company_search_done",
-      "section": "Business Checks",
-      "label": "Company search completed",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "companySearchDone" }
-    },
+    { "id": "loi_all_signatures_initials", "section": "Letter of Intent", "label": "All signatures & Initials", "statusDefault": "PENDING" },
+    { "id": "loi_numbers_match_outline_conditions", "section": "Letter of Intent", "label": "Numbers as per loan outline and special conditions", "statusDefault": "PENDING" },
 
-    {
-      "id": "equifax_clear",
-      "section": "Credit Checks",
-      "label": "Equifax clear",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "equifaxClear" }
-    },
-    {
-      "id": "adverse_media_checked",
-      "section": "Credit Checks",
-      "label": "Adverse media check",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "adverseMediaChecked" }
-    },
+    { "id": "app_all_sections_completed", "section": "Application Form", "label": "All sections fully completed", "statusDefault": "PENDING" },
+    { "id": "app_business_purpose_box_ticked", "section": "Application Form", "label": "Business purpose box ticked", "statusDefault": "PENDING" },
+    { "id": "app_signature_matches_id", "section": "Application Form", "label": "Does the signature match ID", "statusDefault": "PENDING" },
+    { "id": "app_exit_strategy_loan_purpose_provided", "section": "Application Form", "label": "Exit Strategy & Loan Purpose provided", "statusDefault": "PENDING" },
+    { "id": "app_security_offered_details_correct", "section": "Application Form", "label": "Check Security Offered details are correct and filled", "statusDefault": "PENDING" },
+    { "id": "app_borrowers_al_correct", "section": "Application Form", "label": "Check Borrower’s A/L are correct and filled", "statusDefault": "PENDING" },
+    { "id": "app_accountant_solicitor_broker_verification", "section": "Application Form", "label": "Accountant, solicitor and broker verification", "statusDefault": "PENDING" },
+    { "id": "app_directors_match_company_file", "section": "Application Form", "label": "Do the directors match the company file", "statusDefault": "PENDING" },
 
-    {
-      "id": "valuation_ordered",
-      "section": "Valuation",
-      "label": "Valuation ordered",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "valuationOrdered" }
-    },
-    {
-      "id": "valuation_received",
-      "section": "Valuation",
-      "label": "Valuation received",
-      "defaultStatus": "",
-      "rules": { "dealField": "valuationReceived" }
-    },
+    { "id": "abn_check_abn_status", "section": "ABN Search", "label": "Check ABN status", "statusDefault": "PENDING" },
+    { "id": "abn_registered_for_gst_or_not", "section": "ABN Search", "label": "Registered for GST or not", "statusDefault": "PENDING" },
 
-    {
-      "id": "bank_statements_received",
-      "section": "Financials",
-      "label": "Bank statements received",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "bankStatementsReceived" }
-    },
-    {
-      "id": "income_verification_complete",
-      "section": "Financials",
-      "label": "Income verification complete",
-      "defaultStatus": "PENDING",
-      "rules": { "dealField": "incomeVerificationComplete" }
-    }
+    { "id": "asic_adverse_information", "section": "ASIC Search", "label": "Check for any adverse information", "statusDefault": "PENDING" },
+
+    { "id": "borrower_background_provided", "section": "Borrower", "label": "Borrower background provided", "statusDefault": "PENDING" },
+    { "id": "borrower_aleras_search_completed", "section": "Borrower", "label": "Aleras search completed", "statusDefault": "PENDING" },
+    { "id": "borrower_registered_company_trust", "section": "Borrower", "label": "Is the borrower a registered company/trust", "statusDefault": "PENDING" },
+    { "id": "borrower_trust_deed_fully_completed", "section": "Borrower", "label": "Check trust deed is fully completed", "statusDefault": "PENDING" },
+    { "id": "borrower_company_search_conducted", "section": "Borrower", "label": "Has company search been conducted", "statusDefault": "PENDING" },
+    { "id": "borrower_no_adverse_on_company_file", "section": "Borrower", "label": "No adverse evident on company file", "statusDefault": "PENDING" },
+    { "id": "borrower_company_file_matches_id", "section": "Borrower", "label": "Does company file match ID", "statusDefault": "PENDING" },
+
+    { "id": "equifax_enquiry_under_archer_wealth_pty_ltd", "section": "Equifax Search", "label": "Enquiry made under Archer Wealth Pty Ltd, not Archer Wealth Brokerage", "statusDefault": "PENDING" },
+    { "id": "equifax_directors_in_place_gt_6_months", "section": "Equifax Search", "label": "Have the directors been in place for > 6 months", "statusDefault": "PENDING" },
+    { "id": "equifax_scores_gt_600", "section": "Equifax Search", "label": "Are all scores > 600", "statusDefault": "PENDING" },
+    { "id": "equifax_clear_of_adverse", "section": "Equifax Search", "label": "Check if clear of adverse information on report", "statusDefault": "PENDING" },
+
+    { "id": "guarantors_no_borrowers_over_65", "section": "Guarantors", "label": "NO borrowers > 65 yrs old", "statusDefault": "PENDING" },
+    { "id": "guarantors_no_third_party_guarantors", "section": "Guarantors", "label": "NO 3rd party Guarantors", "statusDefault": "PENDING" },
+    { "id": "guarantors_aleras_search_completed", "section": "Guarantors", "label": "Aleras search completed", "statusDefault": "PENDING" },
+    { "id": "guarantors_bankruptcy_search_completed", "section": "Guarantors", "label": "Bankruptcy search completed", "statusDefault": "PENDING" },
+    { "id": "guarantors_fraud_google_search_completed", "section": "Guarantors", "label": "Fraud google search completed", "statusDefault": "PENDING" },
+    { "id": "guarantors_strong_als", "section": "Guarantors", "label": "Do Guarantors have strong A&Ls", "statusDefault": "PENDING" },
+
+    { "id": "accountant_letter_registration_checked", "section": "Accountant Letter (When interest is not fully capitalised)", "label": "Check the registration of accountant", "statusDefault": "PENDING" },
+    { "id": "accountant_letter_letterhead", "section": "Accountant Letter (When interest is not fully capitalised)", "label": "Check the letter is sent on company letterhead", "statusDefault": "PENDING" },
+    { "id": "accountant_letter_dated_addressed_aw", "section": "Accountant Letter (When interest is not fully capitalised)", "label": "Check the letter is dated and addressed to AW", "statusDefault": "PENDING" },
+    { "id": "accountant_letter_signed", "section": "Accountant Letter (When interest is not fully capitalised)", "label": "Check the letter is signed by the accountant", "statusDefault": "PENDING" },
+    { "id": "accountant_letter_serviceability_calculator_completed", "section": "Accountant Letter (When interest is not fully capitalised)", "label": "Serviceability calculator completed", "statusDefault": "PENDING" },
+
+    { "id": "ato_guarantor_tax_portals_provided", "section": "ATO Tax Portals Company & Guarantors clearance", "label": "Guarantor Tax Portals Provided", "statusDefault": "PENDING" },
+    { "id": "ato_company_tax_portals_provided", "section": "ATO Tax Portals Company & Guarantors clearance", "label": "Company Tax Portals Provided", "statusDefault": "PENDING" },
+    { "id": "ato_any_director_penalties", "section": "ATO Tax Portals Company & Guarantors clearance", "label": "Any Director Penalties", "statusDefault": "PENDING" },
+    { "id": "ato_director_id_provided", "section": "ATO Tax Portals Company & Guarantors clearance", "label": "Director ID Provided", "statusDefault": "PENDING" },
+
+    { "id": "securities_title_search_conducted", "section": "Securities", "label": "Has title search been conducted", "statusDefault": "PENDING" },
+    { "id": "securities_no_restrictions_on_use_of_land", "section": "Securities", "label": "NO restrictions on the use of land", "statusDefault": "PENDING" },
+    { "id": "securities_all_investment_properties", "section": "Securities", "label": "Are all securities investment properties", "statusDefault": "PENDING" },
+    { "id": "securities_no_caveats_or_easements", "section": "Securities", "label": "NO caveats or easements on title", "statusDefault": "PENDING" },
+    { "id": "securities_all_pages_initialled_executed", "section": "Securities", "label": "All pages initialled and executed", "statusDefault": "PENDING" },
+
+    { "id": "offer_signature_matches_id", "section": "Offer Letter", "label": "Does signature match ID", "statusDefault": "PENDING" },
+    { "id": "offer_commitment_fees_paid", "section": "Offer Letter", "label": "Have commitment fees been paid", "statusDefault": "PENDING" },
+
+    { "id": "valuation_any_changes_to_deal_metrics", "section": "Valuation and Appraisals", "label": "Any Changes to Deal Metrics", "statusDefault": "PENDING" },
+    { "id": "valuation_dated_within_90_days", "section": "Valuation and Appraisals", "label": "Is the valuation dated within 90 Days", "statusDefault": "PENDING" },
+    { "id": "valuation_addressed_to_archer_wealth", "section": "Valuation and Appraisals", "label": "Are all Valuations addressed to Archer Wealth Pty Ltd (not ARW01)", "statusDefault": "PENDING" },
+    { "id": "valuation_review_completed", "section": "Valuation and Appraisals", "label": "Has valuation review been completed", "statusDefault": "PENDING" },
+    { "id": "valuation_reliability_scorecard_completed", "section": "Valuation and Appraisals", "label": "Has valuation reliability scorecard been completed", "statusDefault": "PENDING" },
+    { "id": "valuation_new_build_gst_included", "section": "Valuation and Appraisals", "label": "(For new builds) GST has been included in the valuation", "statusDefault": "PENDING" },
+
+    { "id": "cos_fully_executed_obtained", "section": "Contract of sale (Purchase deals only) or (When Exit Strategy is Sale)", "label": "Fully executed document is obtained", "statusDefault": "PENDING" },
+    { "id": "cos_address_correct", "section": "Contract of sale (Purchase deals only) or (When Exit Strategy is Sale)", "label": "Check address is correct", "statusDefault": "PENDING" },
+    { "id": "cos_purchaser_names_signed_dated", "section": "Contract of sale (Purchase deals only) or (When Exit Strategy is Sale)", "label": "Purchaser name(s) and is signed and dated", "statusDefault": "PENDING" },
+    { "id": "cos_deposit_paid_amounts", "section": "Contract of sale (Purchase deals only) or (When Exit Strategy is Sale)", "label": "Deposit paid amounts", "statusDefault": "PENDING" },
+
+    { "id": "cos_additional_check_for_debts", "section": "Contract of sale – additional checks", "label": "Check for any debts", "statusDefault": "PENDING" },
+
+    { "id": "refinance_mortgage_statements_6_months", "section": "Mortgage Loan Statements (Refinance Deals)", "label": "Check 6 months mortgage statements and history", "statusDefault": "PENDING" },
+    { "id": "refinance_check_address_correct", "section": "Mortgage Loan Statements (Refinance Deals)", "label": "Check address is correct", "statusDefault": "PENDING" },
+
+    { "id": "docs_executed_application_form", "section": "Document Checklist", "label": "Executed Application form", "statusDefault": "PENDING" },
+    { "id": "docs_executed_offer_letter", "section": "Document Checklist", "label": "Executed Offer Letter", "statusDefault": "PENDING" },
+    { "id": "docs_valid_licence_or_passport", "section": "Document Checklist", "label": "Valid Licence or Passport provided", "statusDefault": "PENDING" },
+    { "id": "docs_director_id_provided", "section": "Document Checklist", "label": "Director ID Provided", "statusDefault": "PENDING" },
+    { "id": "docs_contract_of_sale", "section": "Document Checklist", "label": "Contract of Sale", "statusDefault": "PENDING" },
+    { "id": "docs_trust_deed", "section": "Document Checklist", "label": "Trust deed", "statusDefault": "PENDING" },
+    { "id": "docs_servicing_docs", "section": "Document Checklist", "label": "Servicing docs", "statusDefault": "PENDING" },
+    { "id": "docs_refinance_statements", "section": "Document Checklist", "label": "Refinance statements", "statusDefault": "PENDING" },
+    { "id": "docs_rates", "section": "Document Checklist", "label": "Rates", "statusDefault": "PENDING" },
+    { "id": "docs_company_search", "section": "Document Checklist", "label": "Company search", "statusDefault": "PENDING" },
+    { "id": "docs_title_search", "section": "Document Checklist", "label": "Title search", "statusDefault": "PENDING" },
+    { "id": "docs_credit_report", "section": "Document Checklist", "label": "Credit report", "statusDefault": "PENDING" },
+    { "id": "docs_valuation_and_appraisals", "section": "Document Checklist", "label": "Valuation and Appraisals", "statusDefault": "PENDING" },
+    { "id": "docs_rental_income_evidence", "section": "Document Checklist", "label": "Rental income evidence", "statusDefault": "PENDING" },
+    { "id": "docs_deed_of_priority", "section": "Document Checklist", "label": "Deed of priority", "statusDefault": "PENDING" },
+    { "id": "docs_cross_collateralisation_deed", "section": "Document Checklist", "label": "Cross collateralisation deed", "statusDefault": "PENDING" },
+    { "id": "docs_solicitor_instructions", "section": "Document Checklist", "label": "Solicitor instructions", "statusDefault": "PENDING" },
+    { "id": "docs_insurance_certificate_full_term", "section": "Document Checklist", "label": "Insurance certificate of currency covering full loan term", "statusDefault": "PENDING" },
+    { "id": "docs_verified_deposit_paid_receipt", "section": "Document Checklist", "label": "(Purchase/Sales) Verified deposit paid receipt", "statusDefault": "PENDING" },
+    { "id": "docs_land_tax_notices_all_security", "section": "Document Checklist", "label": "(If applicable) Land tax notices for all security properties", "statusDefault": "PENDING" }
   ]
 }
