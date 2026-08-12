@@ -206,9 +206,10 @@ a {
 
 .mobile-nav a {
   text-decoration: none;
-  padding: 0.75rem 0.5rem;
+  padding: 0.95rem 0.5rem;
   font-weight: 600;
   font-family: var(--font-display);
+  min-height: 2.75rem;
 }
 
 .mobile-nav[hidden] {
@@ -294,16 +295,16 @@ a {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: clamp(1.55rem, 3.6vw, 2.35rem);
+  font-size: clamp(1.45rem, 3.4vw, 2.2rem);
   line-height: 1.15;
   letter-spacing: -0.03em;
-  max-width: 18ch;
+  max-width: 22ch;
 }
 
 .hero-lede {
   margin: 1.15rem 0 0;
   font-size: 1.125rem;
-  max-width: 34ch;
+  max-width: 38ch;
   color: rgba(242, 245, 246, 0.86);
 }
 
@@ -318,13 +319,14 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 2.85rem;
-  padding: 0.7rem 1.2rem;
+  min-height: 3rem;
+  padding: 0.8rem 1.25rem;
   border-radius: 0.3rem;
   text-decoration: none;
   font-weight: 600;
-  font-size: 0.98rem;
+  font-size: 1rem;
   transition: transform 0.2s var(--ease), background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+  -webkit-tap-highlight-color: transparent;
 }
 
 .btn:hover {
@@ -358,6 +360,18 @@ a {
   border-color: rgba(242, 245, 246, 0.7);
 }
 
+.btn-ghost.dark {
+  color: var(--ink);
+  border-color: rgba(14, 21, 24, 0.22);
+  background: transparent;
+}
+
+.btn-ghost.dark:hover,
+.btn-ghost.dark:focus-visible {
+  background: rgba(14, 21, 24, 0.05);
+  border-color: rgba(14, 21, 24, 0.4);
+}
+
 .section {
   padding: clamp(4.5rem, 10vw, 7rem) 0;
 }
@@ -376,8 +390,10 @@ a {
 }
 
 .focus h2,
+.work h2,
 .approach h2,
-.contact h2 {
+.contact h2,
+.section-intro h2 {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 750;
@@ -386,8 +402,15 @@ a {
   line-height: 1.1;
 }
 
-.focus-copy p:not(.section-kicker),
+.section-intro,
+.approach-intro {
+  max-width: 36rem;
+  margin-bottom: 2.75rem;
+}
+
+.section-intro p:not(.section-kicker),
 .approach-intro p:not(.section-kicker),
+.work-copy p:not(.section-kicker),
 .contact-copy p:not(.section-kicker) {
   margin: 1rem 0 0;
   color: var(--slate);
@@ -395,40 +418,76 @@ a {
   font-size: 1.1rem;
 }
 
-.focus-layout {
-  display: grid;
-  gap: 2.5rem;
-}
-
-.focus-points {
+.pillar-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
-  gap: 1.5rem;
+  gap: 1.25rem;
 }
 
-.focus-points li {
+.pillar-list li {
   display: grid;
-  gap: 0.35rem;
-  padding-top: 1.15rem;
+  gap: 0.4rem;
+  padding: 1.25rem 0 0;
   border-top: 1px solid rgba(14, 21, 24, 0.12);
 }
 
-.focus-points strong {
+.pillar-list strong {
   font-family: var(--font-display);
-  font-size: 1.15rem;
+  font-size: 1.2rem;
   letter-spacing: -0.02em;
 }
 
-.focus-points span {
+.pillar-list span {
+  color: var(--slate);
+  max-width: 40rem;
+}
+
+.work {
+  background:
+    linear-gradient(180deg, rgba(126, 168, 181, 0.14), transparent 70%),
+    rgba(255, 255, 255, 0.4);
+}
+
+.work-layout {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+
+.work-copy .btn {
+  margin-top: 1.5rem;
+}
+
+.work-aside {
+  padding: 1.35rem 0 0;
+  border-top: 1px solid rgba(14, 21, 24, 0.12);
+}
+
+.work-aside-label {
+  margin: 0 0 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--slate);
 }
 
-.focus.alt {
-  background:
-    linear-gradient(180deg, rgba(126, 168, 181, 0.12), transparent 70%),
-    rgba(255, 255, 255, 0.35);
+.work-aside ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.work-aside li {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--signal);
 }
 
 .approach {
@@ -442,11 +501,6 @@ a {
 
 .approach-intro p:not(.section-kicker) {
   color: rgba(242, 245, 246, 0.72);
-}
-
-.approach-intro {
-  max-width: 36rem;
-  margin-bottom: 2.75rem;
 }
 
 .steps {
@@ -482,6 +536,96 @@ a {
   margin: 0.55rem 0 0;
   color: rgba(242, 245, 246, 0.72);
   max-width: 34rem;
+}
+
+.page-insight .site-header {
+  color: var(--ink);
+}
+
+.insight-hero {
+  padding: 7.5rem 0 2.5rem;
+  background:
+    radial-gradient(900px 420px at 0% 0%, rgba(126, 168, 181, 0.2), transparent 60%),
+    linear-gradient(180deg, #e8eef0, var(--paper));
+}
+
+.insight-hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(2.2rem, 6vw, 3.6rem);
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+  max-width: 14ch;
+}
+
+.insight-deck {
+  margin: 1.1rem 0 0;
+  font-size: 1.2rem;
+  max-width: 40rem;
+  color: var(--slate);
+}
+
+.insight-meta {
+  margin: 1.25rem 0 0;
+  font-size: 0.92rem;
+  color: var(--slate);
+  letter-spacing: 0.02em;
+}
+
+.insight-body {
+  padding: 2.5rem 0 4rem;
+  display: grid;
+  gap: 2.5rem;
+  max-width: 44rem;
+}
+
+.insight-body h2 {
+  margin: 0 0 0.85rem;
+  font-family: var(--font-display);
+  font-size: 1.55rem;
+  letter-spacing: -0.025em;
+}
+
+.insight-body p {
+  margin: 0 0 1rem;
+  color: var(--slate);
+  font-size: 1.08rem;
+}
+
+.insight-body p:last-child {
+  margin-bottom: 0;
+}
+
+.insight-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.15rem;
+}
+
+.insight-list li {
+  display: grid;
+  gap: 0.3rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(14, 21, 24, 0.1);
+  color: var(--slate);
+}
+
+.insight-list strong {
+  color: var(--ink);
+  font-family: var(--font-display);
+  font-size: 1.08rem;
+}
+
+.insight-cta {
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(14, 21, 24, 0.12);
+}
+
+.insight-cta .hero-actions {
+  margin-top: 1.25rem;
 }
 
 .contact-panel {
@@ -600,18 +744,20 @@ a {
     display: none !important;
   }
 
-  .focus-layout {
-    grid-template-columns: 1.05fr 0.95fr;
-    align-items: start;
-    gap: 4rem;
+  .pillar-list {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.75rem 2.5rem;
   }
 
-  .focus-layout.reverse {
-    grid-template-columns: 0.95fr 1.05fr;
+  .work-layout {
+    grid-template-columns: 1.35fr 0.85fr;
+    gap: 3.5rem;
+    align-items: end;
   }
 
-  .focus-layout.reverse .focus-copy {
-    order: 2;
+  .work-aside {
+    padding: 0;
+    border-top: 0;
   }
 
   .steps {
