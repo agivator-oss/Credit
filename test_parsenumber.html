@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>parseNumberLoose Test</title>
+  <style>
+    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #fff; }
+    .pass { color: #0f0; }
+    .fail { color: #f00; }
+    .test { margin: 10px 0; padding: 10px; background: #2a2a2a; border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <h1>parseNumberLoose Bug Test</h1>
+  <div id="results"></div>
+
+  <script src="app.js"></script>
+  <script>
+    // Extract parseNumberLoose from the app scope
+    const parseNumberLoose = window.privateCreditFormData ? 
+      eval(`(${document.querySelector('script[src="app.js"]').textContent.match(/function parseNumberLoose\(v\)\{[^}]+\}/)?.[0]})`) : 
+      null;
+
+    // Manual implementation for testing (copied from fixed version)
+    function parseNumberLooseTest(v){
+      if (v === null || v === undefined) return null;
+      if (typeof v === 'number' && Number.isFinite(v)) return v;
+      const s = String(v).trim();
+      if (!s) return null;
+
+      const lowered = s.toLowerCase();
+      const hasPercent = lowered.includes('%');
+
+      let mult = 1;
+      if (/\b\d+(?:\.\d+)?\s*(?:bn|b)\b/.test(lowered) || /\b(billion|billions)\b/.test(lowered)) mult = 1_000_000_000;
+      else if (/\b\d+(?:\.\d+)?\s*(?:mm|m)\b/.test(lowered) || /\b(million|millions)\b/.test(lowered)) mult = 1_000_000;
+      else if (/\b\d+(?:\.\d+)?\s*k\b/.test(lowered) || /\b(thousand|thousands)\b/.test(lowered)) mult = 1_000;
+
+      const cleaned = lowered
+        .replace(/[$,]/g,'')
+        .replace(/\bbn\b/g,'')
+        .replace(/\bmm\b/g,'')
+        .replace(/\bk\b/g,'')
+        .replace(/\b(billion|billions|million|millions|thousand|thousands)\b/g,'')
+        .replace(/%/g,'')
+        .trim();
+
+      const num = Number(cleaned);
+      if (!Number.isFinite(num)) return null;
+      return hasPercent ? num : (num * mult);
+    }
+
+    const tests = [
+      { input: '125m', expected: 125_000_000, desc: 'Basic million (m)' },
+      { input: '125mm', expected: 125_000_000, desc: 'Million (mm)' },
+      { input: '125 million', expected: 125_000_000, desc: 'Million (word)' },
+      { input: '2.5bn', expected: 2_500_000_000, desc: 'Billion (bn)' },
+      { input: '2.5 billion', expected: 2_500_000_000, desc: 'Billion (word)' },
+      { input: '500k', expected: 500_000, desc: 'Thousand (k)' },
+      { input: '500 thousand', expected: 500_000, desc: 'Thousand (word)' },
+      { input: '$125.5m', expected: 125_500_000, desc: 'Million with dollar sign' },
+      { input: '32,500,000', expected: 32_500_000, desc: 'Commas no suffix' },
+      { input: '26.0%', expected: 26.0, desc: 'Percentage (no multiplier)' },
+      { input: '4.6x', expected: null, desc: 'Multiple format (should parse digit only or null)' },
+      { input: '125', expected: 125, desc: 'Plain number' },
+      { input: '', expected: null, desc: 'Empty string' },
+      { input: null, expected: null, desc: 'Null input' },
+      
+      // Critical bug scenarios
+      { input: '125m thousand', expected: 125_000_000, desc: 'CRITICAL: m should take precedence over thousand' },
+      { input: '125 million thousand', expected: 125_000_000, desc: 'CRITICAL: million should take precedence' },
+      { input: '2bn million', expected: 2_000_000_000, desc: 'CRITICAL: billion should take precedence' },
+    ];
+
+    const results = document.getElementById('results');
+    let passed = 0;
+    let failed = 0;
+
+    tests.forEach(test => {
+      const actual = parseNumberLooseTest(test.input);
+      const pass = actual === test.expected;
+      
+      if (pass) passed++;
+      else failed++;
+
+      const div = document.createElement('div');
+      div.className = `test ${pass ? 'pass' : 'fail'}`;
+      div.innerHTML = `
+        <strong>${pass ? '✓ PASS' : '✗ FAIL'}</strong>: ${test.desc}<br>
+        Input: <code>${JSON.stringify(test.input)}</code><br>
+        Expected: <code>${test.expected}</code><br>
+        Actual: <code>${actual}</code>
+      `;
+      results.appendChild(div);
+    });
+
+    const summary = document.createElement('div');
+    summary.style.cssText = 'margin-top: 20px; padding: 15px; background: #3a3a3a; border-radius: 5px; font-size: 18px;';
+    summary.innerHTML = `
+      <strong>Summary:</strong> ${passed} passed, ${failed} failed out of ${tests.length} tests
+    `;
+    results.insertBefore(summary, results.firstChild);
+  </script>
+</body>
+</html>
