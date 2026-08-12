@@ -86,7 +86,7 @@
   function detectUnitsScale(text){
     const t = String(text || '').toLowerCase();
     if (/(\$\s*in\s*millions|\$\s*\(in\s*millions\)|in\s*millions|\$mm\b|\bmm\b)/.test(t)) return 1_000_000;
-    if (/(\$\s*in\s*thousands|\$\s*\(in\s*thousands\)|in\s*thousands|\$000s|\b000s\b)/.test(t)) return 1_000;
+    else if (/(\$\s*in\s*thousands|\$\s*\(in\s*thousands\)|in\s*thousands|\$000s|\b000s\b)/.test(t)) return 1_000;
     return 1;
   }
 
