@@ -72,11 +72,13 @@ a {
   inset: 0 0 auto;
   z-index: 50;
   padding: 1rem 0;
-  transition: background 0.35s var(--ease), backdrop-filter 0.35s var(--ease), border-color 0.35s var(--ease);
+  color: var(--paper);
+  transition: background 0.35s var(--ease), backdrop-filter 0.35s var(--ease), border-color 0.35s var(--ease), color 0.35s var(--ease);
   border-bottom: 1px solid transparent;
 }
 
 .site-header.is-scrolled {
+  color: var(--ink);
   background: rgba(242, 245, 246, 0.88);
   backdrop-filter: blur(12px);
   border-bottom-color: rgba(14, 21, 24, 0.08);
@@ -102,12 +104,18 @@ a {
   width: 2.15rem;
   height: 2.15rem;
   border-radius: 0.35rem;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--paper);
+  color: var(--ink);
   font-family: var(--font-display);
   font-weight: 800;
   font-size: 0.8rem;
   letter-spacing: 0.04em;
+  transition: background 0.35s var(--ease), color 0.35s var(--ease);
+}
+
+.site-header.is-scrolled .logo-mark {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 .logo-text {
@@ -127,19 +135,33 @@ a {
   text-decoration: none;
   font-weight: 500;
   font-size: 0.95rem;
-  color: var(--slate);
+  color: rgba(242, 245, 246, 0.82);
   transition: color 0.2s ease;
 }
 
 .nav a:hover,
 .nav a:focus-visible {
+  color: var(--paper);
+}
+
+.site-header.is-scrolled .nav a {
+  color: var(--slate);
+}
+
+.site-header.is-scrolled .nav a:hover,
+.site-header.is-scrolled .nav a:focus-visible {
   color: var(--ink);
 }
 
 .nav-cta {
   padding: 0.45rem 0.9rem;
-  border: 1px solid rgba(14, 21, 24, 0.18);
+  border: 1px solid rgba(242, 245, 246, 0.35);
   border-radius: 0.3rem;
+  color: var(--paper) !important;
+}
+
+.site-header.is-scrolled .nav-cta {
+  border-color: rgba(14, 21, 24, 0.18);
   color: var(--ink) !important;
 }
 
@@ -158,8 +180,12 @@ a {
 .nav-toggle span {
   display: block;
   height: 2px;
-  background: var(--ink);
+  background: currentColor;
   transition: transform 0.25s var(--ease), opacity 0.2s ease;
+}
+
+.mobile-nav {
+  color: var(--ink);
 }
 
 .nav-toggle[aria-expanded="true"] span:first-child {
