@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>HNglobal Setup — Instructions &amp; Checklist</title>
+  <style>
+    :root {
+      --ink: #1a1a1a;
+      --muted: #444;
+      --rule: #ccc;
+      --accent: #0b3d2e;
+      --box: #111;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font: 11.5pt/1.45 "Segoe UI", "Helvetica Neue", Helvetica, Arial, sans-serif;
+      background: #fff;
+    }
+
+    .page {
+      max-width: 8.5in;
+      margin: 0 auto;
+      padding: 0.55in 0.65in 0.7in;
+    }
+
+    header {
+      border-bottom: 2.5px solid var(--accent);
+      padding-bottom: 0.35rem;
+      margin-bottom: 0.85rem;
+    }
+
+    header h1 {
+      margin: 0 0 0.15rem;
+      font-size: 1.55rem;
+      letter-spacing: -0.02em;
+      color: var(--accent);
+    }
+
+    header .subtitle {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    header .meta {
+      margin-top: 0.45rem;
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    h2 {
+      margin: 1.15rem 0 0.4rem;
+      font-size: 1.05rem;
+      color: var(--accent);
+      border-bottom: 1px solid var(--rule);
+      padding-bottom: 0.15rem;
+      page-break-after: avoid;
+    }
+
+    h3 {
+      margin: 0.75rem 0 0.3rem;
+      font-size: 0.95rem;
+      page-break-after: avoid;
+    }
+
+    p, li { margin: 0.25rem 0; }
+
+    .overview {
+      background: #f4f7f5;
+      border: 1px solid #d5e0da;
+      padding: 0.65rem 0.8rem;
+      margin: 0.6rem 0 0.9rem;
+    }
+
+    .overview table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    .overview th,
+    .overview td {
+      text-align: left;
+      vertical-align: top;
+      padding: 0.28rem 0.4rem;
+      border-bottom: 1px solid #dce6e1;
+    }
+
+    .overview th {
+      width: 22%;
+      color: var(--accent);
+      font-weight: 650;
+    }
+
+    .note {
+      font-size: 0.88rem;
+      color: var(--muted);
+      margin: 0.35rem 0 0.6rem;
+    }
+
+    .checklist {
+      list-style: none;
+      padding: 0;
+      margin: 0.25rem 0 0.6rem;
+    }
+
+    .checklist li {
+      display: grid;
+      grid-template-columns: 1.1rem 1fr;
+      gap: 0.45rem;
+      align-items: start;
+      padding: 0.22rem 0;
+      page-break-inside: avoid;
+    }
+
+    .checklist .box {
+      width: 0.95rem;
+      height: 0.95rem;
+      margin-top: 0.18rem;
+      border: 1.6px solid var(--box);
+      border-radius: 2px;
+      display: inline-block;
+      flex-shrink: 0;
+    }
+
+    .checklist .item strong {
+      font-weight: 650;
+    }
+
+    .checklist .hint {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-top: 0.1rem;
+    }
+
+    .steps {
+      counter-reset: step;
+      list-style: none;
+      padding: 0;
+      margin: 0.3rem 0 0.7rem;
+    }
+
+    .steps > li {
+      counter-increment: step;
+      position: relative;
+      padding: 0.35rem 0 0.35rem 2rem;
+      border-bottom: 1px dotted var(--rule);
+      page-break-inside: avoid;
+    }
+
+    .steps > li::before {
+      content: counter(step);
+      position: absolute;
+      left: 0;
+      top: 0.35rem;
+      width: 1.35rem;
+      height: 1.35rem;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #fff;
+      font-size: 0.75rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      line-height: 1;
+    }
+
+    .avoid {
+      border: 1px solid #c9b4b4;
+      background: #fbf5f5;
+      padding: 0.55rem 0.75rem;
+      margin: 0.5rem 0 0.8rem;
+      font-size: 0.9rem;
+    }
+
+    .avoid strong { color: #7a2e2e; }
+
+    .signoff {
+      margin-top: 1.2rem;
+      border-top: 2px solid var(--accent);
+      padding-top: 0.7rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.9rem 1.2rem;
+      font-size: 0.9rem;
+    }
+
+    .signoff .line {
+      border-bottom: 1px solid #333;
+      height: 1.5rem;
+      margin-top: 1.1rem;
+    }
+
+    .signoff .label {
+      color: var(--muted);
+      font-size: 0.8rem;
+      margin-top: 0.2rem;
+    }
+
+    footer {
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      color: #777;
+    }
+
+    @media print {
+      body { font-size: 10.5pt; }
+      .page { padding: 0.35in 0.45in; max-width: none; }
+      a { color: inherit; text-decoration: none; }
+      .no-print { display: none !important; }
+      h2, h3, .steps > li, .checklist li { break-inside: avoid; }
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      background: #0b3d2e;
+      color: #fff;
+      padding: 0.55rem 0.9rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.9rem;
+    }
+
+    .toolbar button {
+      background: #fff;
+      color: #0b3d2e;
+      border: 0;
+      border-radius: 4px;
+      padding: 0.4rem 0.85rem;
+      font-weight: 650;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar no-print">
+    <span>HNglobal setup — print-ready checklist</span>
+    <button type="button" onclick="window.print()">Print</button>
+  </div>
+
+  <div class="page">
+    <header>
+      <h1>HNglobal Setup</h1>
+      <p class="subtitle">Cursor team (2 seats) + GitHub organization — instructions &amp; printable checklist</p>
+      <p class="meta">
+        Goal: one Cursor team named <strong>HNglobal</strong> with seats for
+        <strong>agivator@gmail.com</strong> and <strong>eyredn@gmail.com</strong>;
+        one GitHub org with private repos plus a shared area.
+      </p>
+    </header>
+
+    <section class="overview">
+      <table>
+        <tr>
+          <th>Cursor</th>
+          <td>Upgrade existing account → Teams plan named <strong>HNglobal</strong><br />
+            Seat 1: agivator@gmail.com (Admin) · Seat 2: eyredn@gmail.com (Member or Admin)</td>
+        </tr>
+        <tr>
+          <th>GitHub</th>
+          <td>Create org <strong>HNglobal</strong>; each person uses their own personal GitHub user and joins the org</td>
+        </tr>
+        <tr>
+          <th>Code layout</th>
+          <td>Shared repo(s) both can access + private repo(s) limited by GitHub Teams</td>
+        </tr>
+        <tr>
+          <th>Naming</th>
+          <td>Brand/team = HNglobal · Personal emails stay as seat logins · Profile handles are permanent once claimed</td>
+        </tr>
+      </table>
+    </section>
+
+    <div class="avoid">
+      <strong>Avoid:</strong> creating a second Cursor billing account just to rename;
+      two separate Pro subscriptions; putting “private folders” inside one shared repo and expecting secrecy
+      (GitHub permissions are <em>repo-level</em>, not folder-level).
+    </div>
+
+    <!-- ========== CURSOR ========== -->
+    <h2>1. Cursor — upgrade &amp; name the team</h2>
+    <p class="note">Do this while signed in as <strong>agivator@gmail.com</strong>. One Cursor account can belong to only one team at a time.</p>
+
+    <ol class="steps">
+      <li>
+        Open <a href="https://cursor.com/dashboard">cursor.com/dashboard</a> and sign in as agivator@gmail.com.
+      </li>
+      <li>
+        Choose <strong>Upgrade to Teams</strong> / <strong>Create Team</strong> (wording may vary).
+      </li>
+      <li>
+        Set the <strong>team name</strong> to <strong>HNglobal</strong>. Pick monthly or yearly billing.
+      </li>
+      <li>
+        Complete payment. Teams start on Standard seats; Premium (if available) can be upgraded per member later from the members menu.
+      </li>
+      <li>
+        Confirm you are a <strong>paid Admin</strong> on the team (needed if you use Cursor yourself).
+      </li>
+      <li>
+        Optional: set your display name in account settings. Optional profile handle at
+        <a href="https://cursor.com/profile">cursor.com/profile</a> — <strong>cannot be changed</strong> after claiming.
+      </li>
+    </ol>
+
+    <h3>Cursor checklist</h3>
+    <ul class="checklist">
+      <li><span class="box" aria-hidden="true"></span><span class="item">Signed in as agivator@gmail.com</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Upgraded / created Teams plan</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Team name set to <strong>HNglobal</strong></span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Billing payment completed</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">agivator@gmail.com is Admin (paid seat)</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Display name updated (optional)</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Profile handle claimed only if sure (optional, permanent)</span></li>
+    </ul>
+
+    <!-- ========== INVITE ========== -->
+    <h2>2. Cursor — invite the second seat</h2>
+    <ol class="steps">
+      <li>In the team dashboard, open <strong>Members</strong> / <strong>Invite Members</strong>.</li>
+      <li>Invite <strong>eyredn@gmail.com</strong>. Choose role: <strong>Member</strong> (typical) or <strong>Admin</strong> (if they should manage billing).</li>
+      <li>Have eyredn open the invite email, create/sign in to Cursor with that address, and <strong>accept</strong> the invite.</li>
+      <li>Confirm both seats show as active on the Members page (billing is per active paid seat, prorated).</li>
+    </ol>
+
+    <h3>Second-seat checklist</h3>
+    <ul class="checklist">
+      <li><span class="box" aria-hidden="true"></span><span class="item">Invite sent to eyredn@gmail.com</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Role chosen (Member / Admin): _______________</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Invite accepted; eyredn can open Cursor</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Both seats visible as active on Members</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Passwords stored securely for both accounts (password manager)</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">2FA enabled on both accounts (recommended)</span></li>
+    </ul>
+
+    <!-- ========== GITHUB ========== -->
+    <h2>3. GitHub — org + personal accounts</h2>
+    <p class="note">Use a <strong>GitHub Organization</strong> for the brand. Each person keeps (or creates) a <strong>personal</strong> GitHub user, then joins the org. Do not put company work only on one person’s personal account.</p>
+
+    <ol class="steps">
+      <li>
+        Ensure each person has a personal GitHub account:
+        <ul>
+          <li>Person A (Agivator) — existing or new personal user</li>
+          <li>Person B (eyredn) — existing or new personal user (“separate GitHub account” for the second person)</li>
+        </ul>
+      </li>
+      <li>
+        Create organization <strong>HNglobal</strong> at
+        <a href="https://github.com/organizations/plan">github.com/organizations/plan</a>
+        (Free org is fine for unlimited public/private repos; choose a plan if you need extras).
+      </li>
+      <li>Invite both personal GitHub users as org members. Make at least one an <strong>Owner</strong>.</li>
+      <li>
+        Set org <strong>Base permissions</strong> to <strong>No permission</strong> (Settings → Member privileges)
+        so people only see repos you explicitly grant.
+      </li>
+      <li>
+        Create GitHub Teams, for example:
+        <ul>
+          <li><strong>shared</strong> — both people</li>
+          <li><strong>agivator-private</strong> — Agivator only</li>
+          <li><strong>eyredn-private</strong> — eyredn only</li>
+        </ul>
+      </li>
+    </ol>
+
+    <h3>GitHub account / org checklist</h3>
+    <ul class="checklist">
+      <li><span class="box" aria-hidden="true"></span><span class="item">Personal GitHub ready for Agivator: @_______________</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Personal GitHub ready for eyredn: @_______________</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Org <strong>HNglobal</strong> created</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Both users invited and accepted</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Owner role assigned: _______________</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Base permissions = No permission</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Team <strong>shared</strong> created; both members added</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Team <strong>agivator-private</strong> created</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Team <strong>eyredn-private</strong> created</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">2FA enabled on both GitHub users (recommended)</span></li>
+    </ul>
+
+    <!-- ========== REPOS ========== -->
+    <h2>4. GitHub — private repos + shared area</h2>
+    <p class="note">Use <strong>separate private repositories</strong> for private work. A “shared directory” in practice = one or more shared repos both can access.</p>
+
+    <ol class="steps">
+      <li>Create private repo <strong>HNglobal/shared</strong> (or several shared repos). Grant the <strong>shared</strong> team Write (or Maintain).</li>
+      <li>Create private repo(s) for Agivator-only work. Grant only <strong>agivator-private</strong>.</li>
+      <li>Create private repo(s) for eyredn-only work. Grant only <strong>eyredn-private</strong>.</li>
+      <li>Optional: move existing repos (e.g. from agivator-oss) into the HNglobal org via Settings → Transfer ownership; then re-apply team permissions.</li>
+      <li>Add a short README in each repo stating purpose and who owns it.</li>
+    </ol>
+
+    <h3>Repo checklist</h3>
+    <ul class="checklist">
+      <li><span class="box" aria-hidden="true"></span><span class="item"><strong>shared</strong> repo(s) created · team access: Write</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Agivator private repo(s) created · access limited</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">eyredn private repo(s) created · access limited</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Verified: eyredn cannot open Agivator-only repos (and vice versa)</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Verified: both can clone/push <strong>shared</strong></span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Existing repos transferred / permissions updated (if any)</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">README added to each repo</span></li>
+    </ul>
+
+    <!-- ========== CONNECT ========== -->
+    <h2>5. Connect Cursor ↔ GitHub</h2>
+    <ol class="steps">
+      <li>On each person’s machine, sign into Cursor with their seat email.</li>
+      <li>Connect GitHub (Cursor settings / dashboard integrations) using that person’s <em>personal</em> GitHub account that is in the HNglobal org.</li>
+      <li>Grant the GitHub App / OAuth access to the <strong>HNglobal</strong> organization (org owner may need to approve the app).</li>
+      <li>Open a shared repo in Cursor and confirm Cloud Agents / pull requests work as expected.</li>
+      <li>Repeat a quick smoke test for a private repo on the account that should own it.</li>
+    </ol>
+
+    <h3>Connect checklist</h3>
+    <ul class="checklist">
+      <li><span class="box" aria-hidden="true"></span><span class="item">Agivator: Cursor ↔ GitHub connected</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">eyredn: Cursor ↔ GitHub connected</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">HNglobal org approved access for the Cursor GitHub integration</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Shared repo opens and works in Cursor (both seats)</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">Private-repo smoke test passed</span></li>
+    </ul>
+
+    <!-- ========== ORDER ========== -->
+    <h2>6. Suggested order (one pass)</h2>
+    <ul class="checklist">
+      <li><span class="box" aria-hidden="true"></span><span class="item">① Upgrade Cursor → name team HNglobal</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">② Invite eyredn@gmail.com and confirm seat active</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">③ Create GitHub org HNglobal + personal accounts / invites</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">④ Create Teams + shared / private repos + permissions</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">⑤ Connect each Cursor seat to GitHub and smoke-test</span></li>
+      <li><span class="box" aria-hidden="true"></span><span class="item">⑥ Store credentials in a password manager; enable 2FA everywhere</span></li>
+    </ul>
+
+    <h2>Quick reference</h2>
+    <div class="overview">
+      <table>
+        <tr><th>Cursor dashboard</th><td>https://cursor.com/dashboard</td></tr>
+        <tr><th>New Cursor team</th><td>https://cursor.com/team/new-team</td></tr>
+        <tr><th>Cursor profile / handle</th><td>https://cursor.com/profile</td></tr>
+        <tr><th>GitHub new org</th><td>https://github.com/organizations/plan</td></tr>
+        <tr><th>Seat 1</th><td>agivator@gmail.com — Admin</td></tr>
+        <tr><th>Seat 2</th><td>eyredn@gmail.com — Member / Admin</td></tr>
+        <tr><th>Brand name</th><td>HNglobal (Cursor team + GitHub org)</td></tr>
+      </table>
+    </div>
+
+    <div class="signoff">
+      <div>
+        <div>Completed by</div>
+        <div class="line"></div>
+        <div class="label">Name</div>
+      </div>
+      <div>
+        <div>Date</div>
+        <div class="line"></div>
+        <div class="label">YYYY-MM-DD</div>
+      </div>
+      <div>
+        <div>Agivator confirmed</div>
+        <div class="line"></div>
+        <div class="label">Initials</div>
+      </div>
+      <div>
+        <div>eyredn confirmed</div>
+        <div class="line"></div>
+        <div class="label">Initials</div>
+      </div>
+    </div>
+
+    <footer>
+      Print this page (or use the Print button). Checkboxes are empty squares — mark by hand.
+      Keep passwords out of this printout; use a password manager.
+    </footer>
+  </div>
+</body>
+</html>
