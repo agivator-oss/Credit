@@ -270,8 +270,9 @@ a {
 
 .brand-lockup {
   display: flex;
-  align-items: baseline;
-  gap: 0.65rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
   margin: 0 0 1.25rem;
 }
 
@@ -284,10 +285,10 @@ a {
 }
 
 .brand-legal {
-  font-size: 0.95rem;
+  font-size: 0.85rem;
   font-weight: 500;
   opacity: 0.75;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
