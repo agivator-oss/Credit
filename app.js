@@ -65,9 +65,9 @@
     const hasPercent = lowered.includes('%');
 
     let mult = 1;
-    if (/\b\d+(?:\.\d+)?\s*(?:mm|m)\b/.test(lowered) || /\b(million|millions)\b/.test(lowered)) mult = 1_000_000;
     if (/\b\d+(?:\.\d+)?\s*(?:bn|b)\b/.test(lowered) || /\b(billion|billions)\b/.test(lowered)) mult = 1_000_000_000;
-    if (/\b\d+(?:\.\d+)?\s*k\b/.test(lowered) || /\b(thousand|thousands)\b/.test(lowered)) mult = 1_000;
+    else if (/\b\d+(?:\.\d+)?\s*(?:mm|m)\b/.test(lowered) || /\b(million|millions)\b/.test(lowered)) mult = 1_000_000;
+    else if (/\b\d+(?:\.\d+)?\s*k\b/.test(lowered) || /\b(thousand|thousands)\b/.test(lowered)) mult = 1_000;
 
     const cleaned = lowered
       .replace(/[$,]/g,'')
@@ -86,7 +86,7 @@
   function detectUnitsScale(text){
     const t = String(text || '').toLowerCase();
     if (/(\$\s*in\s*millions|\$\s*\(in\s*millions\)|in\s*millions|\$mm\b|\bmm\b)/.test(t)) return 1_000_000;
-    if (/(\$\s*in\s*thousands|\$\s*\(in\s*thousands\)|in\s*thousands|\$000s|\b000s\b)/.test(t)) return 1_000;
+    else if (/(\$\s*in\s*thousands|\$\s*\(in\s*thousands\)|in\s*thousands|\$000s|\b000s\b)/.test(t)) return 1_000;
     return 1;
   }
 
