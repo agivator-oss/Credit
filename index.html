@@ -3,366 +3,179 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Private Credit Underwriting — Static Data Entry (Offline)</title>
+  <meta name="description" content="HNglobal Pty Ltd — strategy and analytics for leaders who need clarity under pressure." />
+  <title>HNglobal Pty Ltd — Strategy &amp; Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Source+Sans+3:wght@400;500;600&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="header" role="banner">
-      <div class="topbar">
-        <div class="brand">
-          <strong>Private Credit Underwriting — Data Entry & Extraction</strong>
-          <span>Static offline app (open <span class="mono">index.html</span> directly). Keyboard-first workflow.</span>
-        </div>
+  <a class="skip-link" href="#main">Skip to content</a>
 
-        <div class="stat" title="Completion">
-          <span class="dot primary" id="completion-dot"></span>
-          <span><span id="completion-percent">0%</span> complete</span>
-        </div>
-
-        <div class="stat" title="Issues">
-          <span class="dot" id="issues-dot"></span>
-          <span><span id="issues-count">0</span> issues</span>
-        </div>
-
-        <div class="spacer"></div>
-
-        <button class="btn" id="btn-cmd" type="button" aria-label="Open command palette (Ctrl+K)">Command <span class="kbd">Ctrl</span>+<span class="kbd">K</span></button>
-        <button class="btn" id="btn-validate" type="button">Validate <span class="kbd">F8</span></button>
-        <button class="btn success" id="btn-export" type="button">Export</button>
-        <button class="btn danger" id="btn-clear" type="button">Clear</button>
-      </div>
-    </header>
-
-    <main class="main" role="main">
-      <div class="grid">
-        <!-- LEFT: ingestion + raw text + AI (mock) output -->
-        <section class="card" aria-label="Ingestion and extraction">
-          <div class="card-header">
-            <h2>1) Ingest & Mock-Extract (Offline)</h2>
-            <span class="badge">No backend • No network • Deterministic mock</span>
-          </div>
-          <div class="card-body">
-            <div class="field">
-              <label for="fileInput">Upload source file</label>
-              <input class="input" id="fileInput" type="file" accept="application/pdf,.xlsx,.xls,.csv,.txt" />
-              <div class="validation" id="fileInput-validation"></div>
-              <div class="help">
-                Offline note: PDF/XLSX parsing is stubbed. Use CSV/TXT or paste text below.
-              </div>
-            </div>
-
-            <div class="row">
-              <button class="btn" id="btn-load-sample" type="button">Load sample CIM text</button>
-              <button class="btn primary" id="btn-extract" type="button">Extract (Mock) <span class="kbd">Ctrl</span>+<span class="kbd">Enter</span></button>
-            </div>
-
-            <div class="field" style="margin-top:12px;">
-              <label for="rawText">Raw text (paste CIM text here)</label>
-              <textarea id="rawText" class="input mono" spellcheck="false" aria-label="Raw text"></textarea>
-              <div class="help">Tip: Keep page markers like <span class="mono">[p12]</span> if you have them—evidence links will reference these.</div>
-            </div>
-
-            <div class="field" style="margin-top:12px;">
-              <label for="aiJson">Extraction output (JSON)</label>
-              <textarea id="aiJson" class="input mono" spellcheck="false" aria-label="Mock extraction output JSON" readonly></textarea>
-              <div class="help">Auto-applies only when confidence ≥ threshold and evidence exists.</div>
-            </div>
-
-            <div class="row">
-              <div class="field" style="margin-bottom:0;">
-                <label for="confidenceThreshold">Auto-apply threshold</label>
-                <select id="confidenceThreshold" class="input">
-                  <option value="0.85">0.85 (conservative)</option>
-                  <option value="0.75" selected>0.75 (balanced)</option>
-                  <option value="0.60">0.60 (aggressive)</option>
-                </select>
-              </div>
-              <div class="field" style="margin-bottom:0;">
-                <label for="mode">Mode</label>
-                <select id="mode" class="input">
-                  <option value="offline_mock" selected>Offline mock extractor</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field" style="margin-top:12px;">
-              <label for="log">Run log</label>
-              <textarea id="log" class="input mono" readonly aria-label="Run log"></textarea>
-            </div>
-          </div>
-        </section>
-
-        <!-- RIGHT: keyboard-first data entry -->
-        <section class="card" aria-label="Deal data entry">
-          <div class="card-header">
-            <h2>2) Deal Data Entry</h2>
-            <span class="badge">Enter=next • Shift+Enter=prev</span>
-          </div>
-          <div class="card-body">
-            <div class="tabs" role="tablist" aria-label="Form sections">
-              <button class="tab" role="tab" aria-selected="true" data-tab="tab-borrower">Borrower</button>
-              <button class="tab" role="tab" aria-selected="false" data-tab="tab-financials">Financials</button>
-              <button class="tab" role="tab" aria-selected="false" data-tab="tab-debt">Debt</button>
-              <button class="tab" role="tab" aria-selected="false" data-tab="tab-metrics">Metrics</button>
-              <button class="tab" role="tab" aria-selected="false" data-tab="tab-review">Review</button>
-            </div>
-
-            <!-- Borrower -->
-            <div class="section active" id="tab-borrower" role="tabpanel">
-              <div class="row" style="margin-top:12px;">
-                <div class="field">
-                  <label for="dealname">Deal name<span class="required-asterisk" aria-hidden="true">*</span>
-                    <span class="confidence" id="dealname-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="dealname" required data-required="true" data-type="text" />
-                  <div class="validation" id="dealname-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="borrowername">Borrower legal name<span class="required-asterisk" aria-hidden="true">*</span>
-                    <span class="confidence" id="borrowername-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="borrowername" required data-required="true" data-type="text" />
-                  <div class="validation" id="borrowername-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="industry">Industry
-                    <span class="confidence" id="industry-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="industry" data-type="text" />
-                  <div class="validation" id="industry-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="currency">Reporting currency</label>
-                  <input class="input" id="currency" placeholder="USD" data-type="currency_code" />
-                  <div class="validation" id="currency-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="unitsscale">Units scale</label>
-                  <select class="input" id="unitsscale" data-type="units_scale">
-                    <option value="1">1 (full units)</option>
-                    <option value="1000">1,000 (thousands)</option>
-                    <option value="1000000">1,000,000 (millions)</option>
-                  </select>
-                  <div class="validation" id="unitsscale-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="asofdate">As-of date (LTM)</label>
-                  <input class="input" id="asofdate" type="date" data-type="date" />
-                  <div class="validation" id="asofdate-validation"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Financials -->
-            <div class="section" id="tab-financials" role="tabpanel">
-              <div class="help" style="margin-top:10px;">MVP captures one period quickly. Multi-year support can be added later.</div>
-              <div class="row" style="margin-top:12px;">
-                <div class="field">
-                  <label for="periodend">Period end date</label>
-                  <input class="input" id="periodend" type="date" data-type="date" />
-                  <div class="validation" id="periodend-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="periodmonths">Period months</label>
-                  <select class="input" id="periodmonths" data-type="int">
-                    <option value="12" selected>12</option>
-                    <option value="3">3</option>
-                    <option value="6">6</option>
-                    <option value="9">9</option>
-                  </select>
-                  <div class="validation" id="periodmonths-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="revenue">Revenue<span class="required-asterisk" aria-hidden="true">*</span>
-                    <span class="confidence" id="revenue-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="revenue" required data-required="true" data-type="money" inputmode="decimal" placeholder="e.g., 125000000" />
-                  <div class="validation" id="revenue-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="ebitda">EBITDA<span class="required-asterisk" aria-hidden="true">*</span>
-                    <span class="confidence" id="ebitda-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="ebitda" required data-required="true" data-type="money" inputmode="decimal" placeholder="e.g., 32500000" />
-                  <div class="validation" id="ebitda-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="ebitdamargin">EBITDA margin (%)
-                    <span class="confidence" id="ebitdamargin-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="ebitdamargin" data-type="percent" inputmode="decimal" placeholder="e.g., 26.0" />
-                  <div class="validation" id="ebitdamargin-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="netincome">Net income</label>
-                  <input class="input" id="netincome" data-type="money" inputmode="decimal" />
-                  <div class="validation" id="netincome-validation"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Debt -->
-            <div class="section" id="tab-debt" role="tabpanel">
-              <div class="help" style="margin-top:10px;">MVP supports one primary tranche.</div>
-              <div class="row" style="margin-top:12px;">
-                <div class="field">
-                  <label for="tranchename">Tranche name
-                    <span class="confidence" id="tranchename-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="tranchename" data-type="text" placeholder="e.g., Unitranche" />
-                  <div class="validation" id="tranchename-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="tranchetype">Tranche type</label>
-                  <input class="input" id="tranchetype" data-type="text" placeholder="e.g., senior secured" />
-                  <div class="validation" id="tranchetype-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="commitment">Commitment</label>
-                  <input class="input" id="commitment" data-type="money" inputmode="decimal" />
-                  <div class="validation" id="commitment-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="drawn">Drawn amount</label>
-                  <input class="input" id="drawn" data-type="money" inputmode="decimal" />
-                  <div class="validation" id="drawn-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="maturity">Maturity date</label>
-                  <input class="input" id="maturity" type="date" data-type="date" />
-                  <div class="validation" id="maturity-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="marginbps">Margin (bps)</label>
-                  <input class="input" id="marginbps" data-type="bps" inputmode="numeric" placeholder="e.g., 550" />
-                  <div class="validation" id="marginbps-validation"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Metrics -->
-            <div class="section" id="tab-metrics" role="tabpanel">
-              <div class="row" style="margin-top:12px;">
-                <div class="field">
-                  <label for="totaldebt">Total debt (LTM)
-                    <span class="confidence" id="totaldebt-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="totaldebt" data-type="money" inputmode="decimal" />
-                  <div class="validation" id="totaldebt-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="netdebt">Net debt (LTM)
-                    <span class="confidence" id="netdebt-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="netdebt" data-type="money" inputmode="decimal" />
-                  <div class="validation" id="netdebt-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="totallev">Total leverage (x)
-                    <span class="confidence" id="totallev-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="totallev" data-type="multiple" inputmode="decimal" placeholder="e.g., 4.2" />
-                  <div class="validation" id="totallev-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="netlev">Net leverage (x)
-                    <span class="confidence" id="netlev-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="netlev" data-type="multiple" inputmode="decimal" placeholder="e.g., 3.8" />
-                  <div class="validation" id="netlev-validation"></div>
-                </div>
-              </div>
-
-              <div class="row">
-                <div class="field">
-                  <label for="interestcov">Interest coverage (x)
-                    <span class="confidence" id="interestcov-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="interestcov" data-type="multiple" inputmode="decimal" placeholder="e.g., 2.1" />
-                  <div class="validation" id="interestcov-validation"></div>
-                </div>
-                <div class="field">
-                  <label for="fccr">Fixed charge coverage (x)
-                    <span class="confidence" id="fccr-confidence" aria-label="confidence"></span>
-                  </label>
-                  <input class="input" id="fccr" data-type="multiple" inputmode="decimal" placeholder="e.g., 1.6" />
-                  <div class="validation" id="fccr-validation"></div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Review -->
-            <div class="section" id="tab-review" role="tabpanel">
-              <div class="help" style="margin-top:10px;">Review gates: Next issue <span class="kbd">F8</span> • Jump missing required <span class="kbd">Ctrl</span>+<span class="kbd">Shift</span>+<span class="kbd">Enter</span></div>
-              <div class="field" style="margin-top:12px;">
-                <label for="reviewSummary">Summary</label>
-                <textarea id="reviewSummary" class="input mono" readonly></textarea>
-              </div>
-              <div class="row">
-                <button class="btn" id="btn-copy-json" type="button">Copy JSON</button>
-                <button class="btn" id="btn-copy-csv" type="button">Copy CSV</button>
-              </div>
-            </div>
-
-            <div style="margin-top:12px;">
-              <div class="progress" aria-label="Completion progress"><div id="completion-bar"></div></div>
-            </div>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <!-- Issues rail -->
-    <aside class="issue-rail" id="issueRail" aria-label="Issues" style="display:none;">
-      <div class="issue-rail-header">
-        <strong>Issues</strong>
-        <span class="pill" id="pillIssues">0</span>
-        <div class="spacer"></div>
-        <button class="btn" id="btn-hide-issues" type="button">Hide</button>
-      </div>
-      <div class="issue-rail-body" id="issueRailBody"></div>
-    </aside>
-
-    <!-- Command palette -->
-    <div class="modal" id="cmdModal" aria-hidden="true" role="dialog" aria-label="Command palette">
-      <div class="modal-panel">
-        <div class="modal-header">
-          <strong>Command palette</strong>
-          <span class="badge">Type to search fields/actions</span>
-          <div class="spacer"></div>
-          <button class="btn" id="cmdClose" type="button">Close <span class="kbd">Esc</span></button>
-        </div>
-        <div class="modal-body">
-          <input class="input" id="cmdInput" type="text" autocomplete="off" placeholder="Jump to field (e.g., ebitda) or action (export, validate, extract)" />
-          <div class="cmdlist" id="cmdList" aria-label="Commands"></div>
-          <div class="help" style="margin-top:10px;">Navigate: <span class="kbd">↑</span>/<span class="kbd">↓</span>, Select: <span class="kbd">Enter</span>, Close: <span class="kbd">Esc</span></div>
-        </div>
-      </div>
+  <header class="site-header" data-reveal>
+    <div class="shell header-inner">
+      <a class="logo" href="#top" aria-label="HNglobal home">
+        <span class="logo-mark" aria-hidden="true">HN</span>
+        <span class="logo-text">HNglobal</span>
+      </a>
+      <nav class="nav" aria-label="Primary">
+        <a href="#strategy">Strategy</a>
+        <a href="#analytics">Analytics</a>
+        <a href="#approach">Approach</a>
+        <a class="nav-cta" href="#contact">Contact</a>
+      </nav>
+      <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="mobile-nav" aria-label="Open menu">
+        <span></span><span></span>
+      </button>
     </div>
-  </div>
+    <div id="mobile-nav" class="mobile-nav" hidden>
+      <a href="#strategy">Strategy</a>
+      <a href="#analytics">Analytics</a>
+      <a href="#approach">Approach</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </header>
 
-  <script src="./app.js"></script>
+  <main id="main">
+    <section class="hero" id="top" aria-label="Introduction">
+      <div class="hero-media" aria-hidden="true">
+        <img
+          src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=2400&q=80"
+          alt=""
+          width="2400"
+          height="1600"
+          fetchpriority="high"
+        />
+        <div class="hero-veil"></div>
+        <div class="hero-grid"></div>
+      </div>
+
+      <div class="shell hero-content">
+        <p class="brand-lockup" data-reveal>
+          <span class="brand-name">HNglobal</span>
+          <span class="brand-legal">Pty Ltd</span>
+        </p>
+        <h1 class="hero-title" data-reveal data-delay="1">
+          Strategy and analytics that hold under pressure.
+        </h1>
+        <p class="hero-lede" data-reveal data-delay="2">
+          We help leadership teams decide faster, with evidence they can defend.
+        </p>
+        <div class="hero-actions" data-reveal data-delay="3">
+          <a class="btn btn-primary" href="#contact">Start a conversation</a>
+          <a class="btn btn-ghost" href="#approach">See how we work</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="section focus" id="strategy">
+      <div class="shell focus-layout">
+        <div class="focus-copy" data-reveal>
+          <p class="section-kicker">Strategy</p>
+          <h2>Direction before detail.</h2>
+          <p>
+            We clarify the choices that matter — market position, capital allocation,
+            operating model — and translate them into a plan your organisation can execute.
+          </p>
+        </div>
+        <ul class="focus-points" data-reveal data-delay="1">
+          <li>
+            <strong>Growth &amp; portfolio</strong>
+            <span>Where to play, what to stop, and how to sequence bets.</span>
+          </li>
+          <li>
+            <strong>Operating design</strong>
+            <span>Structures and rituals that keep strategy alive after the deck is closed.</span>
+          </li>
+          <li>
+            <strong>Board-ready narrative</strong>
+            <span>Clear options, trade-offs, and recommended path — without theatre.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section focus alt" id="analytics">
+      <div class="shell focus-layout reverse">
+        <div class="focus-copy" data-reveal>
+          <p class="section-kicker">Analytics</p>
+          <h2>Signal over noise.</h2>
+          <p>
+            We build the measurement and insight layers leaders actually use —
+            from diagnostic baselines to decision dashboards that stay honest.
+          </p>
+        </div>
+        <ul class="focus-points" data-reveal data-delay="1">
+          <li>
+            <strong>Decision metrics</strong>
+            <span>KPIs tied to choices, not vanity scorecards.</span>
+          </li>
+          <li>
+            <strong>Diagnostic deep-dives</strong>
+            <span>Root-cause analysis when performance drifts or a thesis breaks.</span>
+          </li>
+          <li>
+            <strong>Insight systems</strong>
+            <span>Lightweight reporting that survives handoff to the operating team.</span>
+          </li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="section approach" id="approach">
+      <div class="shell">
+        <div class="approach-intro" data-reveal>
+          <p class="section-kicker">Approach</p>
+          <h2>Three moves. No theatre.</h2>
+          <p>A tight engagement rhythm designed for clarity, not slide volume.</p>
+        </div>
+        <ol class="steps">
+          <li data-reveal>
+            <span class="step-num">01</span>
+            <h3>Frame the decision</h3>
+            <p>Define the question, constraints, and what “good” looks like before any analysis starts.</p>
+          </li>
+          <li data-reveal data-delay="1">
+            <span class="step-num">02</span>
+            <h3>Pressure-test the evidence</h3>
+            <p>Combine market, financial, and operational signal — then challenge the story the data wants to tell.</p>
+          </li>
+          <li data-reveal data-delay="2">
+            <span class="step-num">03</span>
+            <h3>Lock the path</h3>
+            <p>Deliver a recommended course with owners, milestones, and the metrics that prove it is working.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <section class="section contact" id="contact">
+      <div class="shell contact-panel" data-reveal>
+        <div class="contact-copy">
+          <p class="section-kicker light">Contact</p>
+          <h2>Tell us what you need to decide.</h2>
+          <p>
+            Share the context, the timeline, and the decision on the table.
+            We will respond with a clear next step.
+          </p>
+        </div>
+        <div class="contact-actions">
+          <a class="btn btn-primary" href="mailto:hello@hnglobal.com.au">hello@hnglobal.com.au</a>
+          <p class="contact-note">HNglobal Pty Ltd · Strategy &amp; Analytics</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell footer-inner">
+      <p><strong>HNglobal Pty Ltd</strong></p>
+      <p>Strategy &amp; analytics for decisive leadership.</p>
+      <p class="footer-meta">&copy; <span id="year"></span> HNglobal Pty Ltd. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="./site.js" defer></script>
 </body>
 </html>
